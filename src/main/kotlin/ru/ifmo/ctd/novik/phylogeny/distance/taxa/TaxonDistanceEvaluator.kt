@@ -7,5 +7,5 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
  */
 interface TaxonDistanceEvaluator {
     fun evaluate(lhs: Taxon, rhs: Taxon): Int
-    fun preprocessTaxonList(taxonList: List<Taxon>)
+    fun preprocessTaxonList(taxonList: List<Taxon>) {}
 }

@@ -23,7 +23,7 @@ class SimpleMergingCandidate(
 
         for (firstNode in firstCandidate.taxonList) {
             for (secondNode in secondCandidate.taxonList) {
-                val currentDistance = evaluator.evaluate(firstNode.taxon!!, secondNode.taxon!!)
+                val currentDistance = evaluator.evaluate(firstNode.taxon, secondNode.taxon)
                 if (distance == currentDistance) {
                     pairs.add(Pair(firstNode, secondNode))
                 }

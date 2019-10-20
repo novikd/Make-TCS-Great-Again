@@ -37,6 +37,4 @@ class EditDistanceEvaluator : TaxonDistanceEvaluator {
 
         return dp[left.length - 1][right.length - 1]
     }
-
-    override fun preprocessTaxonList(taxonList: List<Taxon>) {}
 }

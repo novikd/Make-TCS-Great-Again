@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.tree
 
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.common.createTaxon
 
 /**
  * @author Novik Dmitry ITMO University
@@ -8,9 +9,11 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 
 typealias Path = MutableList<Node>
 
-data class Node(val taxon: Taxon? = null) {
-    val isRealTaxon = taxon != null
+data class Node(val taxon: Taxon) {
+    val isRealTaxon = taxon.genome.startsWith("intermediate")
     var neighbors: Array<Node> = emptyArray()
+
+    constructor() : this(createTaxon())
 
     fun addNeighbor(node: Node) {
         neighbors += node
@@ -38,6 +41,10 @@ data class Node(val taxon: Taxon? = null) {
         if (result.isEmpty())
             result.add(mutableListOf(this))
         return result
+    }
+
+    override fun toString(): String {
+        return taxon.genome
     }
 }
 

@@ -19,6 +19,4 @@ class SimpleTaxonDistanceEvaluator : TaxonDistanceEvaluator {
         }
         return result
     }
-
-    override fun preprocessTaxonList(taxonList: List<Taxon>) {}
 }

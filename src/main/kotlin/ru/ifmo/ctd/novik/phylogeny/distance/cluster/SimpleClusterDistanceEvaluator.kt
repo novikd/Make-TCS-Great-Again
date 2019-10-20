@@ -17,7 +17,7 @@ class SimpleClusterDistanceEvaluator(private val distanceEvaluator: TaxonDistanc
         var result = Int.MAX_VALUE
         for (left in lhs.taxonList) {
             for (right in rhs.taxonList) {
-                result = min(result, evaluate(left.taxon!!, right.taxon!!))
+                result = min(result, evaluate(left.taxon, right.taxon))
             }
         }
         return result
