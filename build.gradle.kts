@@ -13,6 +13,14 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib", "1.3.50"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
 
 application {
