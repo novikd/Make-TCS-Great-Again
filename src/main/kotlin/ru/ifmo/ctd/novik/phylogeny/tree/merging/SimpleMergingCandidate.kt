@@ -30,6 +30,7 @@ class SimpleMergingCandidate(
             }
         }
 
+        val bridges = mutableListOf<IMergingBridge>()
         for ((first, second) in pairs) {
             val firstPossiblePaths = first.getAdjacentTaxonList()
             val secondPossiblePaths = second.getAdjacentTaxonList()
@@ -55,9 +56,10 @@ class SimpleMergingCandidate(
                 }
             }
 
-            bridge.build()
+            bridges.add(bridge)
         }
 
+        bridges.forEach { it.build() }
         return result
     }
 }
