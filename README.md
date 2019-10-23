@@ -2,6 +2,7 @@ Make TCS Great Again
 =========================
 
 [![Build Status](https://travis-ci.com/novikd/Make-TCS-Great-Again.svg?branch=master)](https://travis-ci.com/novikd/Make-TCS-Great-Again)
+[![Coverage Status](https://coveralls.io/repos/github/novikd/Make-TCS-Great-Again/badge.svg?branch=master)](https://coveralls.io/github/novikd/Make-TCS-Great-Again?branch=master)
 
 Kotlin implementation of TCS algorithm.
 Implemented as a baseline solution for future expansion of the underlying approach. 
