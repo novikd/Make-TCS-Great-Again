@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.tree.merging
 
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.tree.createEdge
 
 /**
  * @author Novik Dmitry ITMO University
@@ -17,12 +18,10 @@ class MergingBridge(
 
         for (i in 0 until length - 1) {
             val newNode = Node()
-            current.addNeighbor(newNode)
-            newNode.addNeighbor(current)
+            createEdge(current, newNode)
             current = newNode
         }
 
-        current.addNeighbor(secondNode)
-        secondNode.addNeighbor(current)
+        createEdge(current, secondNode)
     }
 }

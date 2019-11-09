@@ -6,9 +6,6 @@ import ru.ifmo.ctd.novik.phylogeny.common.createTaxon
 /**
  * @author Novik Dmitry ITMO University
  */
-
-typealias Path = MutableList<Node>
-
 data class Node(val taxon: Taxon) {
     val isRealTaxon = !taxon.genome.startsWith("intermediate")
     var neighbors: Array<Node> = emptyArray()
