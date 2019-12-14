@@ -18,10 +18,10 @@ interface MergingCandidate {
 
 internal object EmptyMergingCandidate : MergingCandidate {
     override val distance: Int = Int.MAX_VALUE
-    override val firstCandidate: Cluster =
-        emptyCluster()
-    override val secondCandidate: Cluster =
-        emptyCluster()
+    override val firstCandidate: Cluster
+        get() = throw MergingException("Doesn't have any candidate")
+    override val secondCandidate: Cluster
+        get() = throw MergingException("Doesn't have any candidate")
 
     override fun merge(evaluator: TaxonDistanceEvaluator, mergeMetric: MergeMetric): Cluster =
         throw MergingException("Can't merge empty candidate")
