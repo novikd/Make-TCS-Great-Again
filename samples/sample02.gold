@@ -1,0 +1,8 @@
+graph G {
+"AAAAA" -- "intermediate1"
+"intermediate1" -- "AAACT"
+"intermediate1" -- "intermediate2"
+"intermediate2" -- "intermediate3"
+"intermediate3" -- "GGAGC"
+"intermediate3" -- "GGGCC"
+}

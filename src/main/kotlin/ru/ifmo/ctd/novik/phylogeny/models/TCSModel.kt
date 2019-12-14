@@ -14,9 +14,9 @@ import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
  */
 class TCSModel(
     private val distanceEvaluator: ClusterDistanceEvaluator
-) : ClusterDistanceEvaluator by distanceEvaluator {
+) : ClusterDistanceEvaluator by distanceEvaluator, IModel {
 
-    fun computeTree(taxonList: List<Taxon>): Cluster {
+    override fun computeTree(taxonList: List<Taxon>): Cluster {
         taxonDistanceEvaluator.preprocessTaxonList(taxonList)
 
         val clusters = taxonList.map { x -> SimpleCluster(x) }.toMutableList<Cluster>()

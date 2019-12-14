@@ -14,7 +14,7 @@ internal class GraphvizOutputClusterVisitorTest {
         val expected = "graph G {\n" +
                 "\"intermediate0 \" -- \"intermediate1 \"\n" +
                 "\"intermediate1 \" -- \"intermediate2 \"\n" +
-                "\"intermediate0 \" -- \"intermediate2 \"\n" +
+                "\"intermediate2 \" -- \"intermediate0 \"\n" +
                 "}"
         val node1 = Node()
         val node2 = Node()

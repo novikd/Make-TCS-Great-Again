@@ -7,6 +7,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.createTaxon
  * @author Novik Dmitry ITMO University
  */
 data class Node(val taxon: Taxon) {
+    var nodeName: String = taxon.genome
     val isRealTaxon = !taxon.genome.startsWith("intermediate")
     var neighbors: Array<Node> = emptyArray()
 
@@ -41,7 +42,7 @@ data class Node(val taxon: Taxon) {
     }
 
     override fun toString(): String {
-        return taxon.genome
+        return nodeName
     }
 }
 

@@ -15,26 +15,35 @@ class GraphvizOutputClusterVisitor : OutputClusterVisitor {
 
     private fun visit(node: Node): List<String> {
         val result = mutableListOf<String>()
-        val visited = mutableSetOf(node)
+        val visited = mutableMapOf<Node, Int>()
+
+        visited[node] = 1
         for (neighbor in node.neighbors) {
-            result.add(printEdge(node, neighbor))
             if (neighbor !in visited) {
-                result.addAll(visit(neighbor, visited))
+                result.addAll(visit(neighbor, node, visited))
             }
         }
+        visited[node] = 2
+
         return result
     }
 
-    private fun visit(node: Node, visited: MutableSet<Node>): List<String> {
-        val result = mutableListOf<String>()
-        visited.add(node)
+    private fun visit(node: Node, prev: Node, visited: MutableMap<Node, Int>): List<String> {
+        val result = mutableListOf(printEdge(prev, node))
+        if (node in visited)
+            return result
+
+        visited[node] = 1
 
         for (neighbor in node.neighbors) {
-            if (neighbor !in visited) {
-                result.add(printEdge(node, neighbor))
-                result.addAll(visit(neighbor, visited))
-            }
+            val status = visited.getOrDefault(neighbor, 0)
+            if (status == 2 || neighbor == prev)
+                continue
+
+            result.addAll(visit(neighbor, node, visited))
         }
+
+        visited[node] = 2
         return result
     }
 

@@ -1,0 +1,5 @@
+graph G {
+"AC" -- "AA"
+"AA" -- "AG"
+"AG" -- "AC"
+}
