@@ -5,6 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
+import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingException
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.SimpleMergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.emptyMergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
@@ -14,38 +15,27 @@ import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
  */
 class TCSModel(
     private val distanceEvaluator: ClusterDistanceEvaluator
-) : ClusterDistanceEvaluator by distanceEvaluator, IModel {
+) : ClusterDistanceEvaluator by distanceEvaluator, AbstractModel() {
 
-    override fun computeTree(taxonList: List<Taxon>): Cluster {
+    override val defaultMergingCandidate: MergingCandidate = emptyMergingCandidate()
+
+    override fun createClusters(taxonList: List<Taxon>): MutableList<Cluster> {
         taxonDistanceEvaluator.preprocessTaxonList(taxonList)
 
-        val clusters = taxonList.map { x -> SimpleCluster(x) }.toMutableList<Cluster>()
-        while (clusters.size > 1) {
-            var mergingCandidate: MergingCandidate =
-                emptyMergingCandidate()
-            for (i in clusters.indices) {
-                val firstCandidate = clusters[i]
-                for (j in i + 1 until clusters.size) {
-                    val secondCandidate = clusters[j]
-                    val distance = evaluate(firstCandidate, secondCandidate)
-                    if (distance < mergingCandidate.distance) {
-                        mergingCandidate = SimpleMergingCandidate(
-                            distance,
-                            firstCandidate,
-                            secondCandidate
-                        )
-                    }
-                }
-            }
-            val newCluster = mergingCandidate.merge(
+        return taxonList.map { x -> SimpleCluster(x) }.toMutableList()
+    }
+
+    override fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate {
+        val distance = evaluate(first, second)
+        return SimpleMergingCandidate(first, second, distance)
+    }
+
+    override fun mergeClusters(mergingCandidate: MergingCandidate): Cluster {
+        if (mergingCandidate !is SimpleMergingCandidate)
+            throw MergingException("SimpleMergingCandidate expected, but $mergingCandidate found")
+        return mergingCandidate.merge(
                 taxonDistanceEvaluator,
                 TCSMergeMetric(mergingCandidate.distance, taxonDistanceEvaluator)
-            )
-
-            clusters.remove(mergingCandidate.firstCandidate)
-            clusters.remove(mergingCandidate.secondCandidate)
-            clusters.add(newCluster)
-        }
-        return clusters.first()
+        )
     }
 }

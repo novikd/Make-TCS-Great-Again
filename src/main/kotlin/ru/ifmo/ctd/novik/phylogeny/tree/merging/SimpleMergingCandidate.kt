@@ -10,9 +10,9 @@ import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
  * @author Novik Dmitry ITMO University
  */
 class SimpleMergingCandidate(
-    override val distance: Int,
     override val firstCandidate: Cluster,
-    override val secondCandidate: Cluster
+    override val secondCandidate: Cluster,
+    val distance: Int
 ) : MergingCandidate {
 
     override fun merge(evaluator: TaxonDistanceEvaluator, mergeMetric: MergeMetric): Cluster {

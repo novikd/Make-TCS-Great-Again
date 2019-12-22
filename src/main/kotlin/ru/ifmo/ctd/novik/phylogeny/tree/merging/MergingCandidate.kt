@@ -9,7 +9,6 @@ import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
  * @author Novik Dmitry ITMO University
  */
 interface MergingCandidate {
-    val distance: Int
     val firstCandidate: Cluster
     val secondCandidate: Cluster
 
@@ -17,7 +16,6 @@ interface MergingCandidate {
 }
 
 internal object EmptyMergingCandidate : MergingCandidate {
-    override val distance: Int = Int.MAX_VALUE
     override val firstCandidate: Cluster
         get() = throw MergingException("Doesn't have any candidate")
     override val secondCandidate: Cluster
