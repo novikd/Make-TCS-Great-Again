@@ -2,6 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.distance.taxa
 
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import java.lang.Integer.min
+import java.util.*
 
 /**
  * @author Novik Dmitry ITMO University
@@ -11,8 +12,8 @@ class EditDistanceEvaluator : TaxonDistanceEvaluator {
         val left = lhs.genome
         val right = rhs.genome
         val dp = Array(left.length) { IntArray(right.length) }
-        for (i in 1..left.length) {
-            for (j in 1..right.length) {
+        for (i in left.indices) {
+            for (j in right.indices) {
                 dp[i][j] = 0
             }
         }
