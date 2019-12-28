@@ -10,7 +10,9 @@ class SimpleInputTaxaReader {
     fun readFile(filename: String): List<Taxon> {
         val result = mutableListOf<Taxon>()
         var id = 0
-        File(filename).bufferedReader().forEachLine { result.add(Taxon(id++, it)) }
+        File(filename).bufferedReader().forEachLine {
+            result.add(Taxon(id, name = "taxon${id++}", genome = it))
+        }
         return result
     }
 }

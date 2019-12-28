@@ -11,7 +11,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 internal class SimpleInputTaxaReaderTest {
     private val sampleFile = "samples/sample01.txt"
     private val expectedTaxonList = listOf("AA", "AG", "AC")
-        .mapIndexed { id, genome -> Taxon(id, genome) }
+        .mapIndexed { id, genome -> Taxon(id, name = "taxon$id", genome = genome) }
 
     @Test
     fun `readFile on sample01`() {

@@ -12,16 +12,16 @@ internal class EditDistanceEvaluatorTest {
 
     @Test
     fun `equal taxa`() {
-        val first = Taxon(0, "ACGT")
-        val second = Taxon(1, "ACGT")
+        val first = Taxon(0, genome = "ACGT")
+        val second = Taxon(1, genome = "ACGT")
         val evaluator: TaxonDistanceEvaluator = EditDistanceEvaluator()
         assertEquals(0, evaluator.evaluate(first, second))
     }
 
     @Test
     fun `simple substitution in taxon`() {
-        val first = Taxon(0, "AGGT")
-        val second = Taxon(1, "ACGT")
+        val first = Taxon(0, genome = "AGGT")
+        val second = Taxon(1, genome = "ACGT")
         val evaluator: TaxonDistanceEvaluator = EditDistanceEvaluator()
         assertEquals(1, evaluator.evaluate(first, second))
     }

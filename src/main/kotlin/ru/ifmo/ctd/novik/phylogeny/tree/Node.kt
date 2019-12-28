@@ -7,8 +7,8 @@ import ru.ifmo.ctd.novik.phylogeny.common.createTaxon
  * @author Novik Dmitry ITMO University
  */
 data class Node(val taxon: Taxon) {
-    var nodeName: String = taxon.genome
-    val isRealTaxon = !taxon.genome.startsWith("intermediate")
+    var nodeName: String = if (taxon.genome.isNotEmpty()) taxon.genome else taxon.name
+    val isRealTaxon = !taxon.name.startsWith("intermediate")
     var neighbors: Array<Node> = emptyArray()
 
     constructor() : this(createTaxon())
