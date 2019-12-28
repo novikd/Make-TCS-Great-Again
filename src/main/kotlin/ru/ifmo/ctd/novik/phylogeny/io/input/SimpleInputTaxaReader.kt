@@ -6,8 +6,8 @@ import java.io.File
 /**
  * @author Novik Dmitry ITMO University
  */
-class SimpleInputTaxaReader {
-    fun readFile(filename: String): List<Taxon> {
+class SimpleInputTaxaReader : InputTaxaReader {
+    override fun readFile(filename: String): List<Taxon> {
         val result = mutableListOf<Taxon>()
         var id = 0
         File(filename).bufferedReader().forEachLine {
