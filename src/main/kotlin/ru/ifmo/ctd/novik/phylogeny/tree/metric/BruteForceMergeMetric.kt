@@ -42,7 +42,7 @@ class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluato
             }
 
             if (processPathPart(firstNode.taxon, metaData.firstDistance, secondDistances) == ProcessionResult.FAIL) {
-                return Int.MIN_VALUE
+                continue
             }
             val newFirstTaxon = firstNode.taxon.copy(genome = builder.toString())
 
@@ -53,14 +53,13 @@ class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluato
             val newSecondTaxon = secondNode.taxon.copy(genome = builder.toString())
 
             if (processPathPart(secondNode.taxon, metaData.secondDistance, firstDistances) == ProcessionResult.FAIL) {
-                return Int.MIN_VALUE
+                continue
             }
 
             val firstMetric = computeDistanceDiff(newFirstTaxon, firstDistances)
             val secondMetric = computeDistanceDiff(newSecondTaxon, secondDistances)
-            if (firstMetric == Int.MIN_VALUE || secondMetric == Int.MIN_VALUE)
-                return Int.MIN_VALUE
-            return -metaData.bridgeLength
+            if (firstMetric != Int.MIN_VALUE && secondMetric != Int.MIN_VALUE)
+                return -metaData.bridgeLength
         }
         return Int.MIN_VALUE
     }
