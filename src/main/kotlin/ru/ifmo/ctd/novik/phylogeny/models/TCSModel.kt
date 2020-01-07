@@ -7,13 +7,12 @@ import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingException
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.SimpleMergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.emptyMergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
+import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
 
 /**
  * @author Novik Dmitry ITMO University
  */
-class TCSModel(
+open class TCSModel(
     private val distanceEvaluator: ClusterDistanceEvaluator
 ) : ClusterDistanceEvaluator by distanceEvaluator, AbstractModel() {
 
@@ -27,15 +26,12 @@ class TCSModel(
 
     override fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate {
         val distance = evaluate(first, second)
-        return SimpleMergingCandidate(first, second, distance)
+        return SimpleMergingCandidate(first, second, taxonDistanceEvaluator, distance)
     }
 
     override fun mergeClusters(mergingCandidate: MergingCandidate): Cluster {
         if (mergingCandidate !is SimpleMergingCandidate)
             throw MergingException("SimpleMergingCandidate expected, but $mergingCandidate found")
-        return mergingCandidate.merge(
-                taxonDistanceEvaluator,
-                TCSMergeMetric(mergingCandidate.distance, taxonDistanceEvaluator)
-        )
+        return mergingCandidate.merge()
     }
 }

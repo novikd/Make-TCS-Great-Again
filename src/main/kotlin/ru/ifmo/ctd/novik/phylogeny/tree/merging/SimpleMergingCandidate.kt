@@ -5,36 +5,31 @@ import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
+import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
+import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingBridge
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
-class SimpleMergingCandidate(
+open class SimpleMergingCandidate(
     override val firstCandidate: Cluster,
     override val secondCandidate: Cluster,
+    override val taxonDistanceEvaluator: TaxonDistanceEvaluator,
     val distance: Int
 ) : MergingCandidate {
 
-    override fun merge(evaluator: TaxonDistanceEvaluator, mergeMetric: MergeMetric): Cluster {
+    override val mergeMetric: MergeMetric by lazy { TCSMergeMetric(distance, taxonDistanceEvaluator) }
+
+    override fun merge(): Cluster {
         val result: Cluster =
             SimpleCluster(firstCandidate.taxonList.plus(secondCandidate.taxonList))
 
-        val pairs = arrayListOf<Pair<Node, Node>>()
-
-        for (firstNode in firstCandidate.taxonList) {
-            for (secondNode in secondCandidate.taxonList) {
-                val currentDistance = evaluator.evaluate(firstNode.taxon, secondNode.taxon)
-                if (distance == currentDistance) {
-                    pairs.add(Pair(firstNode, secondNode))
-                }
-            }
-        }
+        val pairs = findEdgeNodes(taxonDistanceEvaluator)
 
         val bridges = mutableSetOf<IMergingBridge>()
         for ((first, second) in pairs) {
             val firstPossiblePaths = first.getAdjacentTaxonList()
             val secondPossiblePaths = second.getAdjacentTaxonList()
-
 
             var bridge: IMergingBridge = emptyMergingBridge()
             for (firstPath in firstPossiblePaths) {
@@ -45,7 +40,8 @@ class SimpleMergingCandidate(
                             if (bridgeLength < 1)
                                 continue
 
-                            val metric = mergeMetric.compute(firstNode, secondNode, bridgeLength)
+                            val metaData = MergingMetaData(first, i, second, j, bridgeLength)
+                            val metric = mergeMetric.compute(firstNode, secondNode, metaData)
                             if (metric == Int.MIN_VALUE)
                                 continue
                             if (metric > bridge.metric) {
@@ -61,5 +57,19 @@ class SimpleMergingCandidate(
 
         bridges.forEach { it.build() }
         return result
+    }
+
+    private fun findEdgeNodes(evaluator: TaxonDistanceEvaluator): ArrayList<Pair<Node, Node>> {
+        val pairs = arrayListOf<Pair<Node, Node>>()
+
+        for (firstNode in firstCandidate.taxonList) {
+            for (secondNode in secondCandidate.taxonList) {
+                val currentDistance = evaluator.evaluate(firstNode.taxon, secondNode.taxon)
+                if (distance == currentDistance) {
+                    pairs.add(Pair(firstNode, secondNode))
+                }
+            }
+        }
+        return pairs
     }
 }

@@ -1,0 +1,18 @@
+graph G {
+"AAAAA" -- "intermediate1"
+"intermediate1" -- "AAACT"
+"AAACT" -- "intermediate2"
+"intermediate2" -- "intermediate3"
+"intermediate3" -- "intermediate4"
+"intermediate4" -- "GGAGC"
+"GGAGC" -- "intermediate5"
+"intermediate5" -- "GGGCC"
+"GGGCC" -- "intermediate6"
+"intermediate6" -- "intermediate7"
+"intermediate7" -- "intermediate8"
+"intermediate8" -- "AAACT"
+"GGAGC" -- "intermediate9"
+"intermediate9" -- "intermediate10"
+"intermediate10" -- "intermediate11"
+"intermediate11" -- "AAAAA"
+}

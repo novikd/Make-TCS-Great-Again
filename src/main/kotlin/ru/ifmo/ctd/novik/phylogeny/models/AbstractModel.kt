@@ -12,9 +12,9 @@ import ru.ifmo.ctd.novik.phylogeny.utils.compareCandidates
 abstract class AbstractModel : IModel {
     abstract val defaultMergingCandidate: MergingCandidate
 
-    abstract fun createClusters(taxonList: List<Taxon>): MutableList<Cluster>
-    abstract fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate
-    abstract fun mergeClusters(mergingCandidate: MergingCandidate): Cluster
+    protected abstract fun createClusters(taxonList: List<Taxon>): MutableList<Cluster>
+    protected abstract fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate
+    protected abstract fun mergeClusters(mergingCandidate: MergingCandidate): Cluster
 
     override fun computeTree(taxonList: List<Taxon>): Cluster {
         val clusters = createClusters(taxonList)

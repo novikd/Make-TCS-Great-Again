@@ -7,6 +7,7 @@ import java.io.File
 
 abstract class AbstractTestWithFile {
     abstract val testDirectory: String
+    abstract val outputExtensionPrefix: String
 
     fun runTests(test:(String.()-> String)) {
         val directory = File(testDirectory)
@@ -14,10 +15,10 @@ abstract class AbstractTestWithFile {
         directory.walkTopDown().filter { it.extension == "txt" }.forEach {
             val testOutput = test(it.absolutePath)
 
-            val outputFile = File(directory, it.nameWithoutExtension + ".out")
+            val outputFile = File(directory, it.nameWithoutExtension + outputExtensionPrefix + ".out")
             outputFile.writeText(testOutput)
 
-            val goldFile = File(directory, it.nameWithoutExtension + ".gold")
+            val goldFile = File(directory, it.nameWithoutExtension + outputExtensionPrefix + ".gold")
             val testGold: String
             val msg: String
             if (!goldFile.exists()) {

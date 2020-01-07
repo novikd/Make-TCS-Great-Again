@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import java.util.*
 
 fun Cluster.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
 
@@ -28,4 +29,26 @@ fun Cluster.unify(): Cluster {
         }
     }
     return this
+}
+
+fun Node.computeGraphDistances(): Map<Node, Int> {
+    val result = hashMapOf<Node, Int>()
+    result[this] = 0
+
+    val queue: Queue<Node> = ArrayDeque()
+    queue.add(this)
+
+    while (queue.isNotEmpty()) {
+        val currentNode = queue.poll()
+        val currentDistance = result[currentNode]!!
+        for (neighbor in currentNode.neighbors) {
+
+            if (!result.contains(neighbor)) {
+                result[neighbor] = currentDistance + 1
+                queue.add(neighbor)
+            }
+        }
+    }
+
+    return result.filterKeys { x -> x.isRealTaxon }
 }
