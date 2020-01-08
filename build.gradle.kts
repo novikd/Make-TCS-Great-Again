@@ -4,7 +4,7 @@ group = "Make-TCS-Great-Again"
 version = "0.1"
 
 plugins {
-    kotlin("jvm") version "1.3.50"
+    kotlin("jvm") version "1.3.60"
     application
     jacoco
     id("com.github.kt3k.coveralls") version "2.8.2"
@@ -13,11 +13,13 @@ plugins {
 repositories {
     jcenter()
     mavenCentral()
+    maven(url = "https://dl.bintray.com/kotlin/kotlin-dev")
 }
 
 dependencies {
-    implementation(kotlin("stdlib", "1.3.50"))
+    implementation(kotlin("stdlib", "1.3.60"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+    implementation("com.github.ajalt:clikt:2.3.0")
 }
 
 application {
