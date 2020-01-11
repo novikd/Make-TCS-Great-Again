@@ -19,7 +19,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib", "1.3.60"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
-    implementation("com.github.ajalt:clikt:2.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.2.0-dev-7")
 }
 
 application {
