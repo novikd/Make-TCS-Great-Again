@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.distance.taxa
 
+import ru.ifmo.ctd.novik.phylogeny.common.Genome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import java.lang.Integer.min
 import java.util.*
@@ -9,8 +10,9 @@ import java.util.*
  */
 class EditDistanceEvaluator : TaxonDistanceEvaluator {
     override fun evaluate(lhs: Taxon, rhs: Taxon): Int {
-        val left = lhs.genome
-        val right = rhs.genome
+        assert(lhs.genome is Genome && rhs.genome is Genome)
+        val left = lhs.genome.primary
+        val right = rhs.genome.primary
         val dp = Array(left.length) { IntArray(right.length) }
         for (i in left.indices) {
             for (j in right.indices) {

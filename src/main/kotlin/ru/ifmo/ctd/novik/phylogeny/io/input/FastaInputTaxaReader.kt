@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.io.input
 
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 import java.io.File
 
 /**
@@ -17,7 +18,7 @@ class FastaInputTaxaReader : InputTaxaReader {
         reader.forEachLine {
             if (it.startsWith(">")) {
                 if (genome.isNotEmpty())
-                    result.add(Taxon(id++, name, genome))
+                    result.add(Taxon(id++, name, genome.toGenome()))
                 name = it.removePrefix(">")
                 genome = ""
             } else {
@@ -26,7 +27,7 @@ class FastaInputTaxaReader : InputTaxaReader {
         }
 
         if (result.size == id && genome.isNotEmpty())
-            result.add(Taxon(id++, name, genome))
+            result.add(Taxon(id++, name, genome.toGenome()))
         return result
     }
 }

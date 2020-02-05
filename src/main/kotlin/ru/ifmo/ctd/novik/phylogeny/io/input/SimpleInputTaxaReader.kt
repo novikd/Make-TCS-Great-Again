@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.io.input
 
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 import java.io.File
 
 /**
@@ -11,7 +12,7 @@ class SimpleInputTaxaReader : InputTaxaReader {
         val result = mutableListOf<Taxon>()
         var id = 0
         File(filename).bufferedReader().forEachLine {
-            result.add(Taxon(id, name = "taxon${id++}", genome = it))
+            result.add(Taxon(id, name = "taxon${id++}", genome = it.toGenome()))
         }
         return result
     }

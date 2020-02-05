@@ -31,6 +31,14 @@ fun Cluster.unify(): Cluster {
     return this
 }
 
+typealias Path = MutableList<Node>
+
+fun createEdge(v: Node, u: Node, directed: Boolean = false) {
+    v.connect(u)
+    if (!directed)
+        u.connect(v)
+}
+
 fun Node.computeGraphDistances(): Map<Node, Int> {
     val result = hashMapOf<Node, Int>()
     result[this] = 0

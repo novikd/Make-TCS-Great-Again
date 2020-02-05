@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 import java.io.File
 
 /**
@@ -17,7 +18,7 @@ internal class FastaInputTaxaReaderTest {
             ">taxon2\n" +
             "AC"
     private val expectedTaxonList = listOf("AA", "AG", "AC")
-            .mapIndexed { id, genome -> Taxon(id, name = "taxon$id", genome = genome) }
+            .mapIndexed { id, genome -> Taxon(id, name = "taxon$id", genome = genome.toGenome()) }
 
     @Test
     fun readFile() {

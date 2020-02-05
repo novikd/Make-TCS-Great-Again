@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.tree.merging
 
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.createEdge
+import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
 
 /**
  * @author Novik Dmitry ITMO University

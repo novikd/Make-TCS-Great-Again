@@ -21,9 +21,6 @@ open class SimpleMergingCandidate(
     override val mergeMetric: MergeMetric by lazy { TCSMergeMetric(distance, taxonDistanceEvaluator) }
 
     override fun merge(): Cluster {
-        val result: Cluster =
-            SimpleCluster(firstCandidate.taxonList.plus(secondCandidate.taxonList))
-
         val pairs = findEdgeNodes(taxonDistanceEvaluator)
 
         val bridges = mutableSetOf<IMergingBridge>()
@@ -54,9 +51,9 @@ open class SimpleMergingCandidate(
 
             bridges.add(bridge)
         }
-
         bridges.forEach { it.build() }
-        return result
+
+        return SimpleCluster(firstCandidate.taxonList.plus(secondCandidate.taxonList))
     }
 
     private fun findEdgeNodes(evaluator: TaxonDistanceEvaluator): ArrayList<Pair<Node, Node>> {

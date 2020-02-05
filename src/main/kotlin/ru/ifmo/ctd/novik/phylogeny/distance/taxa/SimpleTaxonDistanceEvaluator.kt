@@ -8,8 +8,8 @@ import kotlin.math.min
  */
 class SimpleTaxonDistanceEvaluator : TaxonDistanceEvaluator {
     override fun evaluate(lhs: Taxon, rhs: Taxon): Int {
-        val left = lhs.genome
-        val right = rhs.genome
+        val left = lhs.genome.primary
+        val right = rhs.genome.primary
         val length = min(left.length, right.length)
 
         var result = 0
