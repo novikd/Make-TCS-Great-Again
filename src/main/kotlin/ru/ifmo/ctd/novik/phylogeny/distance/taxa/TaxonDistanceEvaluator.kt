@@ -6,6 +6,5 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
  * @author Novik Dmitry ITMO University
  */
 interface TaxonDistanceEvaluator {
-    fun evaluate(lhs: Taxon, rhs: Taxon): Int
-    fun preprocessTaxonList(taxonList: List<Taxon>) {}
+    fun evaluate(lhs: Taxon, rhs: Taxon): TaxonDistance
 }

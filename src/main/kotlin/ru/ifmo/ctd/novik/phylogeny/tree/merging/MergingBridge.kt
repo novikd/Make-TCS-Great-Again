@@ -13,11 +13,12 @@ class MergingBridge(
     override val metric: Int
 ) : IMergingBridge {
 
-    override fun build() {
+    override fun build(nodeList: MutableList<Node>) {
         var current = firstNode
 
         for (i in 0 until length - 1) {
             val newNode = Node()
+            nodeList.add(newNode)
             createEdge(current, newNode)
             current = newNode
         }

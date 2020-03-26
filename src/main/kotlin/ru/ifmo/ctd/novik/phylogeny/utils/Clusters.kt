@@ -18,7 +18,7 @@ fun Cluster.traverse(action: (Node.() -> Unit)) {
         }
     }
 
-    return visit(this.taxonList.first())
+    return visit(this.nodes.first())
 }
 
 fun Cluster.unify(): Cluster {
@@ -39,7 +39,9 @@ fun createEdge(v: Node, u: Node, directed: Boolean = false) {
         u.connect(v)
 }
 
-fun Node.computeGraphDistances(): Map<Node, Int> {
+
+
+fun Node.computeAllGraphDistances(): Map<Node, Int> {
     val result = hashMapOf<Node, Int>()
     result[this] = 0
 
@@ -58,5 +60,7 @@ fun Node.computeGraphDistances(): Map<Node, Int> {
         }
     }
 
-    return result.filterKeys { x -> x.isRealTaxon }
+    return result
 }
+
+fun Node.computeGraphDistances(): Map<Node, Int> = this.computeAllGraphDistances().filterKeys { x -> x.isRealTaxon }

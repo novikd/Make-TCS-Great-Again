@@ -9,7 +9,7 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
 class GraphvizOutputClusterVisitor : OutputClusterVisitor {
 
     override fun visit(cluster: Cluster): String {
-        val node = cluster.taxonList.first()
+        val node = cluster.nodes.first()
         return visit(node).joinToString(separator = "\n", prefix = "graph G {\n", postfix = "\n}")
     }
 

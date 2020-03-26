@@ -24,7 +24,7 @@ abstract class AbstractMergeMetric(
                 val graphDistance = firstDistance + metaData.bridgeLength + secondDistance
                 val realDistance = evaluate(firstClusterNode.taxon, secondClusterNode.taxon)
 
-                result += compareDistances(graphDistance, realDistance)
+                result += compareDistances(graphDistance, realDistance.value)
             }
         }
 

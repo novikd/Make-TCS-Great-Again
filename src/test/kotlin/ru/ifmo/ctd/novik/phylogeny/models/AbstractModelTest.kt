@@ -5,14 +5,22 @@ import ru.ifmo.ctd.novik.phylogeny.base.AbstractTestWithFile
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.PrimaryTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.utils.PhylogeneticModel
+import ru.ifmo.ctd.novik.phylogeny.utils.create
 import ru.ifmo.ctd.novik.phylogeny.utils.evaluateSimpleData
 import ru.ifmo.ctd.novik.phylogeny.utils.toGraphviz
 
 /**
  * @author Dmitry Novik ITMO University
  */
-internal class BruteForceTCSModelTest : AbstractModelTest() {
-    override val testDirectory: String = "samples"
-    override val outputExtensionPrefix: String = ".bf"
-    override val phylogeneticModel: PhylogeneticModel = PhylogeneticModel.BRUTE_FORCE_TCS
+abstract class AbstractModelTest : AbstractTestWithFile() {
+    abstract val phylogeneticModel: PhylogeneticModel
+
+    @Test
+    fun test() {
+        runTests {
+            val model = phylogeneticModel.create()
+            val phylogeneticTree = model.evaluateSimpleData(this)
+            phylogeneticTree.toGraphviz()
+        }
+    }
 }

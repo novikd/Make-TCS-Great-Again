@@ -13,8 +13,8 @@ internal class MutableGenomeTest {
     @Test
     fun getGenomeOptions() {
         val genome = "TC".toMutableGenome()
-        genome.genomeOptions.add("CA")
-        assertEquals(2, genome.genomeOptions.size)
+        genome.add("CA")
+        assertEquals(2, genome.size)
     }
 
     @Test
@@ -26,17 +26,17 @@ internal class MutableGenomeTest {
     @Test
     fun isReal() {
         val genome = "AG".toMutableGenome()
-        assertFalse(genome.isReal())
+        assertFalse(genome.isReal)
     }
 
     @Test
     fun process() {
         val genome = MutableGenome()
-        genome.genomeOptions.addAll(listOf("AT", "TC", "GT", "AC"))
+        genome.addAll(listOf("AT", "TC", "GT", "AC"))
 
         val set = mutableSetOf<String>()
-        genome.process {
-            set.add(this)
+        genome.forEach {
+            set.add(it)
         }
         assertEquals(4, set.size)
     }

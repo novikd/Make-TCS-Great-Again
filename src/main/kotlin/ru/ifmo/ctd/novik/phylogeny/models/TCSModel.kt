@@ -19,8 +19,6 @@ open class TCSModel(
     override val defaultMergingCandidate: MergingCandidate = emptyMergingCandidate()
 
     override fun createClusters(taxonList: List<Taxon>): MutableList<Cluster> {
-        taxonDistanceEvaluator.preprocessTaxonList(taxonList)
-
         return taxonList.map { x -> SimpleCluster(x) }.toMutableList()
     }
 
@@ -30,8 +28,6 @@ open class TCSModel(
     }
 
     override fun mergeClusters(mergingCandidate: MergingCandidate): Cluster {
-        if (mergingCandidate !is SimpleMergingCandidate)
-            throw MergingException("SimpleMergingCandidate expected, but $mergingCandidate found")
         return mergingCandidate.merge()
     }
 }

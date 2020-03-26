@@ -14,7 +14,7 @@ internal class GenomeTest {
     @Test
     fun isReal() {
         val genome = "AT".toGenome()
-        assertTrue(genome.isReal())
+        assertTrue(genome.isReal)
     }
 
     @Test
@@ -23,9 +23,9 @@ internal class GenomeTest {
         var count = 0
         var result = false
 
-        genome.process {
+        genome.forEach {
             count++
-            result = result || (this == "GC")
+            result = result || (it == "GC")
         }
         assertEquals(1, count)
         assertTrue(result)

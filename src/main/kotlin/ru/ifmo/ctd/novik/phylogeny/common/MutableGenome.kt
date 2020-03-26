@@ -4,7 +4,7 @@ package ru.ifmo.ctd.novik.phylogeny.common
  * @author Dmitry Novik ITMO University
  */
 class MutableGenome() : IGenome {
-    val genomeOptions: MutableSet<String> = mutableSetOf()
+    private val genomeOptions: MutableSet<String> = mutableSetOf()
     override val primary: String
         get() = genomeOptions.first()
 
@@ -12,6 +12,19 @@ class MutableGenome() : IGenome {
         genomeOptions.add(genome)
     }
 
-    override fun isReal(): Boolean = false
-    override fun process(action: String.() -> Unit) = genomeOptions.forEach(action)
+    override val isReal: Boolean
+        get() = false
+
+    fun add(genome: String) = genomeOptions.add(genome)
+
+    fun addAll(collection: Collection<String>) = collection.forEach { x -> genomeOptions.add(x) }
+
+    fun remove(genome: String) = genomeOptions.remove(genome)
+
+    val size: Int
+        get() = genomeOptions.size
+
+    override fun contains(genome: String): Boolean = genomeOptions.contains(genome)
+
+    override fun iterator(): Iterator<String> = genomeOptions.iterator()
 }

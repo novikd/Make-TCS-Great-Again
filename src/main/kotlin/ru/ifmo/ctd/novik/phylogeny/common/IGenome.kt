@@ -3,9 +3,9 @@ package ru.ifmo.ctd.novik.phylogeny.common
 /**
  * @author Dmitry Novik ITMO University
  */
-interface IGenome {
+interface IGenome : Iterable<String> {
     val primary: String
 
-    fun isReal(): Boolean
-    fun process(action: (String.() -> Unit))
+    val isReal: Boolean
+    fun contains(genome: String): Boolean
 }

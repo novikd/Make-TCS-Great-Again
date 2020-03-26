@@ -4,25 +4,26 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingMetaData
+import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPosition
 import ru.ifmo.ctd.novik.phylogeny.utils.computeGraphDistances
 import ru.ifmo.ctd.novik.phylogeny.utils.permutations
 import ru.ifmo.ctd.novik.phylogeny.utils.toMutableGenome
 
-class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluator) : MergeMetric {
+open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluator) : MergeMetric {
 
     private enum class ProcessionResult {
         OK, FAIL
     }
 
     override fun compute(firstNode: Node, secondNode: Node, metaData: MergingMetaData): Int {
-        val positions = getMutationPosition(metaData.firstRealTaxon.taxon, metaData.secondRealTaxon.taxon)
+        val positions = computeDistinctPosition(metaData.firstRealTaxon, metaData.secondRealTaxon)
 
         val firstDistances = firstNode.computeGraphDistances()
         val secondDistances = secondNode.computeGraphDistances()
 
+        val secondGenome = metaData.secondRealTaxon.genome.primary
         for (permutation in permutations(positions.size)) {
-            val secondGenome = metaData.secondRealTaxon.taxon.genome.primary
-            val builder = StringBuilder(metaData.firstRealTaxon.taxon.genome.primary)
+            val builder = StringBuilder(metaData.firstRealTaxon.genome.primary)
 
             var index = 0
             fun processPathPart(baseTaxon: Taxon, length: Int, distances: Map<Node, Int>): ProcessionResult {
@@ -32,7 +33,8 @@ class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluato
 
                     val taxon = baseTaxon.copy(genome = builder.toString().toMutableGenome())
                     for (node in distances.keys) {
-                        if (distanceEvaluator.evaluate(taxon, node.taxon) < metaData.bridgeLength)
+                        val distance = distanceEvaluator.evaluate(taxon, node.taxon)
+                        if (distance.value < metaData.bridgeLength)
                             return ProcessionResult.FAIL
                     }
                 }
@@ -40,7 +42,7 @@ class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluato
                 return ProcessionResult.OK
             }
 
-            if (processPathPart(firstNode.taxon, metaData.firstDistance, secondDistances) == ProcessionResult.FAIL) {
+            if (processPathPart(firstNode.taxon, metaData.firstClusterPart.size - 1, secondDistances) == ProcessionResult.FAIL) {
                 continue
             }
             val newFirstTaxon = firstNode.taxon.copy(genome = builder.toString().toMutableGenome())
@@ -51,7 +53,7 @@ class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluato
             }
             val newSecondTaxon = secondNode.taxon.copy(genome = builder.toString().toMutableGenome())
 
-            if (processPathPart(secondNode.taxon, metaData.secondDistance, firstDistances) == ProcessionResult.FAIL) {
+            if (processPathPart(secondNode.taxon, metaData.secondClusterPart.size - 1, firstDistances) == ProcessionResult.FAIL) {
                 continue
             }
 
@@ -63,21 +65,11 @@ class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluato
         return Int.MIN_VALUE
     }
 
-    private fun getMutationPosition(firstTaxon: Taxon, secondTaxon: Taxon): List<Int> {
-        val firstGenome = firstTaxon.genome.primary
-        val secondGenome = secondTaxon.genome.primary
-        val positions = mutableListOf<Int>()
-        firstGenome.zip(secondGenome).forEachIndexed {
-            index, (first, second) -> if (first != second) positions.add(index)
-        }
-        return positions
-    }
-
     private fun computeDistanceDiff(taxon: Taxon, graphDistances: Map<Node, Int>): Int {
         var result = 0
         graphDistances.forEach { (node, graphDistance) ->
             val actualDistance = distanceEvaluator.evaluate(taxon, node.taxon)
-            if (graphDistance != actualDistance)
+            if (graphDistance != actualDistance.value)
                 result = Int.MIN_VALUE
         }
         return result

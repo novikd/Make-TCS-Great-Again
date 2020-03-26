@@ -9,14 +9,14 @@ internal class EmptyMergingCandidateTest {
     @Test
     fun `First candidate must not exist`() {
         assertThrows(MergingException::class.java) {
-            emptyMergingCandidate().firstCandidate
+            emptyMergingCandidate().firstCluster
         }
     }
 
     @Test
     fun `Second candidate must not exist`() {
         assertThrows(MergingException::class.java) {
-            emptyMergingCandidate().secondCandidate
+            emptyMergingCandidate().secondCluster
         }
     }
 

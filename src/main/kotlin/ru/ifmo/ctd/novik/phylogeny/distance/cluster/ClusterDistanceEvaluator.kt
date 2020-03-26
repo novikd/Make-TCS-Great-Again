@@ -9,6 +9,6 @@ import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 interface ClusterDistanceEvaluator {
     val taxonDistanceEvaluator: TaxonDistanceEvaluator
 
-    fun evaluate(lhs: Cluster, rhs: Cluster): Int
+    fun evaluate(lhs: Cluster, rhs: Cluster): ClusterDistance
 }
 
