@@ -12,6 +12,9 @@ class MutableGenome() : IGenome {
         genomeOptions.add(genome)
     }
 
+    override val isEmpty: Boolean
+        get() = genomeOptions.isEmpty()
+
     override val isReal: Boolean
         get() = false
 
@@ -23,6 +26,10 @@ class MutableGenome() : IGenome {
 
     val size: Int
         get() = genomeOptions.size
+
+    override fun toString(): String {
+        return if (isEmpty) "unknown genome" else primary
+    }
 
     override fun contains(genome: String): Boolean = genomeOptions.contains(genome)
 

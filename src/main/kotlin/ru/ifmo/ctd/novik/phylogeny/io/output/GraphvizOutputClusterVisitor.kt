@@ -2,6 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.io.output
 
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.tree.Topology
 
 /**
  * @author Novik Dmitry ITMO University
@@ -12,6 +13,9 @@ class GraphvizOutputClusterVisitor : OutputClusterVisitor {
         val node = cluster.nodes.first()
         return visit(node).joinToString(separator = "\n", prefix = "graph G {\n", postfix = "\n}")
     }
+
+    override fun visit(topology: Topology): String = topology.edges
+            .joinToString(separator = "\n", prefix = "graph G {\n", postfix = "\n}") { (edge, _) -> edge.toString() }
 
     private fun visit(node: Node): List<String> {
         val result = mutableListOf<String>()

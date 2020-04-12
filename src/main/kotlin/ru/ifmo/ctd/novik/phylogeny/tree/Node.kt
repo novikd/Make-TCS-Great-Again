@@ -9,7 +9,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
  */
 data class Node(val taxon: Taxon) {
     val isRealTaxon = taxon.genome.isReal
-    var nodeName: String = if (taxon.genome.isReal) taxon.genome.primary else taxon.name
+    var nodeName: String = taxon.name
     val neighbors: MutableList<Node> = mutableListOf()
 
     constructor() : this(createTaxon())
@@ -45,7 +45,7 @@ data class Node(val taxon: Taxon) {
         }
 
     override fun toString(): String {
-        return nodeName
+        return if (isRealTaxon) taxon.genome.toString() else "$nodeName{${taxon.genome}}"
     }
 }
 

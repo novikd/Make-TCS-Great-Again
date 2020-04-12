@@ -6,6 +6,7 @@ package ru.ifmo.ctd.novik.phylogeny.common
 interface IGenome : Iterable<String> {
     val primary: String
 
+    val isEmpty: Boolean
     val isReal: Boolean
     fun contains(genome: String): Boolean
 }

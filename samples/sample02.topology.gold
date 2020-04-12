@@ -1,0 +1,7 @@
+graph G {
+"Top{AAAAA}" -- "Top{intermediate1}"
+"Top{intermediate1}" -- "Top{AAACT}"
+"Top{intermediate1}" -- "Top{intermediate3}"
+"Top{intermediate3}" -- "Top{GGAGC}"
+"Top{intermediate3}" -- "Top{GGGCC}"
+}

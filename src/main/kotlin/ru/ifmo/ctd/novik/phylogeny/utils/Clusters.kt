@@ -2,10 +2,14 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
+import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.tree.Topology
+import ru.ifmo.ctd.novik.phylogeny.tree.TopologyNode
 import java.util.*
 
 fun Cluster.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
+fun Topology.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
 
 fun Cluster.traverse(action: (Node.() -> Unit)) {
     val visited = mutableSetOf<Node>()
@@ -29,6 +33,50 @@ fun Cluster.unify(): Cluster {
         }
     }
     return this
+}
+
+fun Cluster.topology(): Topology {
+    val hubs = mutableMapOf<Node, TopologyNode>()
+    val visited = mutableSetOf<Node>()
+
+    val queue = ArrayDeque<Node>()
+    queue.add(nodes.firstOrNull { it.neighbors.size != 2 } ?: terminals.first())
+
+    val edges = mutableListOf<Pair<Edge, Edge>>()
+
+    while (queue.isNotEmpty()) {
+        val node = queue.pop()
+        val topologyNode = hubs.computeIfAbsent(node, ::TopologyNode)
+
+        visited.add(node)
+        node.neighbors.filter { !visited.contains(it) }.forEach {
+            val path = mutableListOf(node, it)
+            var previous = node
+            var current = it
+
+            while (current.neighbors.size == 2) {
+                val next = current.neighbors.first { it != previous }
+                path.add(next)
+                visited.add(current)
+
+                if (visited.contains(next))
+                    break
+                previous = current
+                current = next
+            }
+
+            val topologyCurrent = hubs.computeIfAbsent(current, ::TopologyNode)
+            val edge = Edge(topologyNode, topologyCurrent, path)
+            topologyNode.add(edge)
+            val revEdge = Edge(topologyCurrent, topologyNode, path.reversed())
+            topologyCurrent.add(revEdge)
+
+            edges.add(Pair(edge, revEdge))
+            queue.add(current)
+        }
+    }
+
+    return Topology(hubs.values.toList(), edges)
 }
 
 typealias Path = MutableList<Node>
