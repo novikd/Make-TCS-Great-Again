@@ -1,7 +1,5 @@
 graph G {
-"NODE: AAAAA" -- "NODE: intermediate1{unknown genome}"
-"NODE: intermediate1{unknown genome}" -- "NODE: AAACT"
-"NODE: intermediate1{unknown genome}" -- "NODE: intermediate3{unknown genome}"
-"NODE: intermediate3{unknown genome}" -- "NODE: GGAGC"
-"NODE: intermediate3{unknown genome}" -- "NODE: GGGCC"
+"NODE: AAAAA" -- "NODE: intermediate4{unknown genome}"
+"NODE: intermediate4{unknown genome}" -- "NODE: GGAGC"
+"NODE: intermediate4{unknown genome}" -- "NODE: GGGCC"
 }

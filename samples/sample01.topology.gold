@@ -1,4 +1,3 @@
 graph G {
 "NODE: AC" -- "NODE: AG"
-"NODE: AC" -- "NODE: AG"
 }

@@ -1,0 +1,8 @@
+graph G {
+"AAAAAA" -- "intermediate1{GAAAAA}"
+"intermediate1{GAAAAA}" -- "GGAAAA"
+"intermediate1{GAAAAA}" -- "intermediate2{GACAAA}"
+"intermediate2{GACAAA}" -- "intermediate3{GACTAA}"
+"intermediate3{GACTAA}" -- "GACTAT"
+"intermediate3{GACTAA}" -- "GACTTA"
+}

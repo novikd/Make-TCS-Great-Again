@@ -2,6 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 
 import kotlinx.cli.ArgType
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
+import ru.ifmo.ctd.novik.phylogeny.distance.cluster.AbsoluteClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.AbsoluteTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.CachingTaxonDistanceEvaluator
@@ -26,7 +27,7 @@ fun PhylogeneticModel.create(): IModel {
     return when (this) {
         PhylogeneticModel.BASE_TCS -> TCSModel(RealClusterDistanceEvaluator(CachingTaxonDistanceEvaluator(PrimaryTaxonDistanceEvaluator())))
         PhylogeneticModel.BRUTE_FORCE_TCS -> BruteForceTCSModel(RealClusterDistanceEvaluator(PrimaryTaxonDistanceEvaluator()))
-        PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(RealClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator()))
+        PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(AbsoluteClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator()))
         else -> throw ModelCreationFailureException(this)
     }
 }

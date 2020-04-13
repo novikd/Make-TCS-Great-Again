@@ -1,0 +1,7 @@
+graph G {
+"NODE: AAAAAA" -- "NODE: intermediate1{GAAAAA}"
+"NODE: intermediate1{GAAAAA}" -- "NODE: GGAAAA"
+"NODE: intermediate1{GAAAAA}" -- "NODE: intermediate3{GACTAA}"
+"NODE: intermediate3{GACTAA}" -- "NODE: GACTAT"
+"NODE: intermediate3{GACTAA}" -- "NODE: GACTTA"
+}

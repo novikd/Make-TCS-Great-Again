@@ -10,5 +10,5 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
 class AbsoluteClusterDistanceEvaluator(
         distanceEvaluator: TaxonDistanceEvaluator
 ) : AbstractClusterDistanceEvaluator(distanceEvaluator) {
-    override fun filteredCluster(cluster: Cluster): Iterable<Node> = cluster
+    override fun filteredCluster(cluster: Cluster): Iterable<Node> = cluster.filter { node -> !node.taxon.genome.isEmpty }
 }

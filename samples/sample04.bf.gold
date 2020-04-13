@@ -1,0 +1,8 @@
+graph G {
+"AAAAAA" -- "intermediate1{unknown genome}"
+"intermediate1{unknown genome}" -- "GGAAAA"
+"intermediate1{unknown genome}" -- "intermediate2{unknown genome}"
+"intermediate2{unknown genome}" -- "intermediate3{unknown genome}"
+"intermediate3{unknown genome}" -- "GACTAT"
+"intermediate3{unknown genome}" -- "GACTTA"
+}
