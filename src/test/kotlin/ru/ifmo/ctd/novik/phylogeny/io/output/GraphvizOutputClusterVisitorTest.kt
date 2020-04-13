@@ -12,9 +12,9 @@ internal class GraphvizOutputClusterVisitorTest {
     @Test
     fun `graphviz cycle`() {
         val expected = "graph G {\n" +
-                "\"intermediate0\" -- \"intermediate1\"\n" +
-                "\"intermediate1\" -- \"intermediate2\"\n" +
-                "\"intermediate2\" -- \"intermediate0\"\n" +
+                "\"intermediate0{unknown genome}\" -- \"intermediate1{unknown genome}\"\n" +
+                "\"intermediate1{unknown genome}\" -- \"intermediate2{unknown genome}\"\n" +
+                "\"intermediate2{unknown genome}\" -- \"intermediate0{unknown genome}\"\n" +
                 "}"
         val node1 = Node()
         val node2 = Node()

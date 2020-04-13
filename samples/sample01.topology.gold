@@ -1,4 +1,4 @@
 graph G {
-"Top{AC}" -- "Top{AG}"
-"Top{AC}" -- "Top{AG}"
+"NODE: AC" -- "NODE: AG"
+"NODE: AC" -- "NODE: AG"
 }

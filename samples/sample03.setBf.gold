@@ -1,0 +1,8 @@
+graph G {
+"GGAAAA" -- "GAAAAA"
+"GAAAAA" -- "AAAAAA"
+"GAAAAA" -- "GACAAA"
+"GACAAA" -- "GACTAA"
+"GACTAA" -- "GACTAT"
+"GACTAA" -- "GACTTA"
+}

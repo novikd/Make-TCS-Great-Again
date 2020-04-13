@@ -11,5 +11,5 @@ data class TopologyNode(val node: Node) {
 
     fun add(edge: Edge) = myEdges.add(edge)
 
-    override fun toString(): String = "Top{$node}"
+    override fun toString(): String = "NODE: $node"
 }

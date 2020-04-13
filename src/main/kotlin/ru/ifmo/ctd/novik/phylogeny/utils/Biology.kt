@@ -14,13 +14,17 @@ internal var taxonGenerator = generateSequence (Taxon(0)) { Taxon(it.id + 1) }.i
 
 fun createTaxon(): Taxon = taxonGenerator.next()
 
-fun computeDistinctPosition(firstTaxon: Taxon, secondTaxon: Taxon): List<Int> {
-    val firstGenome = firstTaxon.genome.primary
-    val secondGenome = secondTaxon.genome.primary
+fun computeDistinctPositions(lhs: String, rhs: String): List<Int> {
     val positions = mutableListOf<Int>()
-    firstGenome.zip(secondGenome).forEachIndexed {
+    lhs.zip(rhs).forEachIndexed {
         index, (first, second) -> if (first != second) positions.add(index)
     }
     return positions
+}
+
+fun computeDistinctPositions(firstTaxon: Taxon, secondTaxon: Taxon): List<Int> {
+    val firstGenome = firstTaxon.genome.primary
+    val secondGenome = secondTaxon.genome.primary
+    return computeDistinctPositions(firstGenome, secondGenome)
 }
 
