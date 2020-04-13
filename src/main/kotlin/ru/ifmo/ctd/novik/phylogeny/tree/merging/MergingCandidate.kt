@@ -13,7 +13,7 @@ interface MergingCandidate {
     val taxonDistanceEvaluator: TaxonDistanceEvaluator
     val mergeMetric: MergeMetric
 
-    fun merge(): Cluster
+    fun merge(): MergingResult
     operator fun compareTo(other: MergingCandidate): Int
 }
 

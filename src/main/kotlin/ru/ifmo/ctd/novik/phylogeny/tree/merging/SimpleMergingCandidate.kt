@@ -4,6 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
+import ru.ifmo.ctd.novik.phylogeny.tree.Branch
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
@@ -22,7 +23,7 @@ open class SimpleMergingCandidate(
 
     override val mergeMetric: MergeMetric by lazy { TCSMergeMetric(distance.value, taxonDistanceEvaluator) }
 
-    override fun merge(): Cluster {
+    override fun merge(): MergingResult {
         val pairs = distance.minimumPoints
 
         val bridges = mutableSetOf<IMergingBridge>()
@@ -57,9 +58,12 @@ open class SimpleMergingCandidate(
         val newNodes = mutableListOf<Node>()
         newNodes.addAll(firstCluster)
         newNodes.addAll(secondCluster)
-        bridges.forEach { it.build(newNodes) }
 
-        return SimpleCluster(newNodes)
+        val bridgeNodes = mutableListOf<Node>()
+        bridges.first().build(bridgeNodes)
+        newNodes.addAll(bridgeNodes)
+
+        return MergingResult(SimpleCluster(newNodes), Branch(bridgeNodes))
     }
 
     override operator fun compareTo(other: MergingCandidate): Int {

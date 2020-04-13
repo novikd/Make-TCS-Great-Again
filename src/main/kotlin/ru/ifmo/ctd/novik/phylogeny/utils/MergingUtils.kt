@@ -3,10 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.IMergingBridge
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingException
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.SimpleMergingCandidate
+import ru.ifmo.ctd.novik.phylogeny.tree.merging.*
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
 
 internal const val BRUTE_FORCE_DISTANCE_THRESHOLD = 6
@@ -21,7 +18,7 @@ internal object EmptyMergingCandidate : MergingCandidate {
     override val mergeMetric: MergeMetric
         get() = throw MergingException("EmptyCandidate doesn't have metric")
 
-    override fun merge(): Cluster =
+    override fun merge(): MergingResult =
             throw MergingException("Can't merge empty candidate")
 
     override fun compareTo(other: MergingCandidate): Int = if (other == this) 0 else -1

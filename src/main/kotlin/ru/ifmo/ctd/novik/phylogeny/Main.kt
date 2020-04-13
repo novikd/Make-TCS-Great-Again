@@ -23,5 +23,5 @@ fun main(args: Array<String>) {
     val model = phylogeneticModel.create()
     val phylogeneticTree = model.evaluateSimpleData(input)
 
-    print(phylogeneticTree.toGraphviz())
+    print(phylogeneticTree.cluster.toGraphviz())
 }

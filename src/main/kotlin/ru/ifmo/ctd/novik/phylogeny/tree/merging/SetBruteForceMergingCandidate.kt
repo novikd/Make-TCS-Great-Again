@@ -6,6 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
+import ru.ifmo.ctd.novik.phylogeny.tree.Branch
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
 import ru.ifmo.ctd.novik.phylogeny.utils.*
@@ -24,7 +25,7 @@ class SetBruteForceMergingCandidate(
     override val mergeMetric: MergeMetric
         get() = TODO("not implemented")
 
-    override fun merge(): Cluster {
+    override fun merge(): MergingResult {
         val nodes = mutableListOf<Node>()
         nodes.addAll(firstCluster)
         nodes.addAll(secondCluster)
@@ -60,7 +61,8 @@ class SetBruteForceMergingCandidate(
         MergingBridge(minimum.first, minimum.second, minimum.distance.value, 0).build(newNodes)
         newNodes.forEachIndexed { index, node -> (node.taxon.genome as MutableGenome).addAll(newNodesGenomes[index]) }
         nodes.addAll(newNodes)
-        return SimpleCluster(nodes)
+
+        return MergingResult(SimpleCluster(nodes), Branch(newNodes))
     }
 
     override fun compareTo(other: MergingCandidate): Int {

@@ -5,7 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingException
+import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingResult
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.SimpleMergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
 
@@ -27,7 +27,7 @@ open class TCSModel(
         return SimpleMergingCandidate(first, second, taxonDistanceEvaluator, distance)
     }
 
-    override fun mergeClusters(mergingCandidate: MergingCandidate): Cluster {
+    override fun mergeClusters(mergingCandidate: MergingCandidate): MergingResult {
         return mergingCandidate.merge()
     }
 }

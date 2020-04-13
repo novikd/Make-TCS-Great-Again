@@ -2,8 +2,6 @@ package ru.ifmo.ctd.novik.phylogeny.models
 
 import org.junit.jupiter.api.Test
 import ru.ifmo.ctd.novik.phylogeny.base.AbstractTestWithFile
-import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
-import ru.ifmo.ctd.novik.phylogeny.distance.taxa.PrimaryTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.utils.PhylogeneticModel
 import ru.ifmo.ctd.novik.phylogeny.utils.create
 import ru.ifmo.ctd.novik.phylogeny.utils.evaluateSimpleData
@@ -19,7 +17,7 @@ abstract class AbstractModelTest : AbstractTestWithFile() {
     fun test() {
         runTests {
             val model = phylogeneticModel.create()
-            val phylogeneticTree = model.evaluateSimpleData(this)
+            val phylogeneticTree = model.evaluateSimpleData(this).cluster
             phylogeneticTree.toGraphviz()
         }
     }

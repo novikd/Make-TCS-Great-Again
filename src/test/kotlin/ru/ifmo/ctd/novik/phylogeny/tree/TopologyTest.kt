@@ -15,7 +15,7 @@ internal class TopologyTest : AbstractTestWithFile() {
     fun `topology computation`() {
         runTests {
             val model = PhylogeneticModel.SET_BRUTE_FORCE_TCS.create()
-            val phylogeneticTree = model.evaluateSimpleData(this)
+            val phylogeneticTree = model.evaluateSimpleData(this).cluster
             phylogeneticTree.topology().toGraphviz()
         }
     }
