@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.io.output
 
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
+import ru.ifmo.ctd.novik.phylogeny.common.RootedPhylogeny
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.Topology
 
@@ -16,6 +17,20 @@ class GraphvizOutputClusterVisitor : OutputClusterVisitor {
 
     override fun visit(topology: Topology): String = topology.edges
             .joinToString(separator = "\n", prefix = "graph G {\n", postfix = "\n}") { (edge, _) -> edge.toString() }
+
+    override fun visit(phylogeny: RootedPhylogeny): String {
+        return visitDirected(phylogeny.root).joinToString(separator = "\n", prefix = "digraph G {\n", postfix = "\n}")
+    }
+
+    private fun visitDirected(node: Node): List<String> {
+        val result = mutableListOf<String>()
+
+        node.next.forEach { next ->
+            result.add(printEdge(node, next, "->"))
+            result.addAll(visitDirected(next))
+        }
+        return result
+    }
 
     private fun visit(node: Node): List<String> {
         val result = mutableListOf<String>()
@@ -51,5 +66,5 @@ class GraphvizOutputClusterVisitor : OutputClusterVisitor {
         return result
     }
 
-    private fun printEdge(node: Node, neighbor: Node) = "\"$node\" -- \"$neighbor\""
+    private fun printEdge(node: Node, neighbor: Node, edgeSequence: String = "--") = "\"$node\" $edgeSequence \"$neighbor\""
 }

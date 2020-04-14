@@ -62,6 +62,11 @@ class SetBruteForceMergingCandidate(
         newNodes.forEachIndexed { index, node -> (node.taxon.genome as MutableGenome).addAll(newNodesGenomes[index]) }
         nodes.addAll(newNodes)
 
+        if (newNodes.isEmpty()) {
+            newNodes.add(minimum.first)
+            newNodes.add(minimum.second)
+        }
+
         return MergingResult(SimpleCluster(nodes), Branch(newNodes))
     }
 

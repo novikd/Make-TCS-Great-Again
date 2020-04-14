@@ -7,8 +7,8 @@ import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
  * @author Novik Dmitry ITMO University
  */
 open class MergingBridge(
-    private val firstNode: Node,
-    private val secondNode: Node,
+    val firstNode: Node,
+    val secondNode: Node,
     private val length: Int,
     override val metric: Int
 ) : IMergingBridge {

@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.tree
 
+import ru.ifmo.ctd.novik.phylogeny.common.IGenome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.utils.Path
 import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
@@ -11,6 +12,11 @@ data class Node(val taxon: Taxon) {
     val isRealTaxon = taxon.genome.isReal
     var nodeName: String = taxon.name
     val neighbors: MutableList<Node> = mutableListOf()
+    val next: MutableList<Node> = mutableListOf()
+
+    val parent: Node? by lazy {
+        neighbors.find { node -> node.next.contains(this) }
+    }
 
     constructor() : this(createTaxon())
 

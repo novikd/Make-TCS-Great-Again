@@ -63,6 +63,12 @@ open class SimpleMergingCandidate(
         bridges.first().build(bridgeNodes)
         newNodes.addAll(bridgeNodes)
 
+        if (bridgeNodes.isEmpty()) {
+            val bridge = bridges.first() as MergingBridge
+            bridgeNodes.add(bridge.firstNode)
+            bridgeNodes.add(bridge.secondNode)
+        }
+
         return MergingResult(SimpleCluster(newNodes), Branch(bridgeNodes))
     }
 
