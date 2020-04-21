@@ -14,7 +14,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
  */
 open class TCSModel(
     private val distanceEvaluator: ClusterDistanceEvaluator
-) : ClusterDistanceEvaluator by distanceEvaluator, AbstractModel() {
+) : ClusterDistanceEvaluator by distanceEvaluator, AbstractDistanceBasedModel() {
 
     override val defaultMergingCandidate: MergingCandidate = emptyMergingCandidate()
 

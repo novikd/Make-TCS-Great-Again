@@ -8,4 +8,6 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
 interface Cluster : Iterable<Node> {
     val nodes: List<Node>
     val terminals: List<Node>
+
+    fun clone(): Cluster
 }

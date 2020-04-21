@@ -80,4 +80,6 @@ open class SimpleMergingCandidate(
 
         return other.distance.value.compareTo(distance.value)
     }
+
+    override fun toString(): String = "SIMPLE_MERGING_CANDIDATE {Cluster distance: ${distance.value}}"
 }

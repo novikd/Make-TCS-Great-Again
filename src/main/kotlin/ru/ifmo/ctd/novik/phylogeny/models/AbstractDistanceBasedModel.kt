@@ -4,20 +4,26 @@ import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.Phylogeny
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.tree.Branch
+import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingResult
+import ru.ifmo.ctd.novik.phylogeny.utils.logger
 
 /**
  * @author Novik Dmitry ITMO University
  */
-abstract class AbstractModel : IModel {
+abstract class AbstractDistanceBasedModel : IModel {
     abstract val defaultMergingCandidate: MergingCandidate
+
+    companion object {
+        val log = logger()
+    }
 
     protected abstract fun createClusters(taxonList: List<Taxon>): MutableList<Cluster>
     protected abstract fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate
     protected abstract fun mergeClusters(mergingCandidate: MergingCandidate): MergingResult
 
-    override fun computeTree(taxonList: List<Taxon>): Phylogeny {
+    override fun computePhylogeny(taxonList: List<Taxon>): Phylogeny {
         val clusters = createClusters(taxonList)
 
         val branches = mutableListOf<Branch>()
@@ -33,6 +39,7 @@ abstract class AbstractModel : IModel {
                         currentCandidate = newCandidate
                 }
             }
+            log.info { "Merging candidate: $currentCandidate" }
             val (newCluster, branch) = mergeClusters(currentCandidate)
 
             clusters.remove(currentCandidate.firstCluster)
@@ -41,5 +48,9 @@ abstract class AbstractModel : IModel {
             branches.add(branch)
         }
         return Phylogeny(clusters.first(), branches)
+    }
+
+    override fun computeTopology(taxonList: List<Taxon>): RootedTopology {
+        error("$this can not compute topology")
     }
 }

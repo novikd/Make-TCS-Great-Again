@@ -2,33 +2,31 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 
 import kotlinx.cli.ArgType
 import ru.ifmo.ctd.novik.phylogeny.common.Phylogeny
+import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.AbsoluteClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.AbsoluteTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.CachingTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.PrimaryTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.io.input.SimpleInputTaxaReader
-import ru.ifmo.ctd.novik.phylogeny.models.BruteForceTCSModel
-import ru.ifmo.ctd.novik.phylogeny.models.IModel
-import ru.ifmo.ctd.novik.phylogeny.models.SetBruteForceTCSModel
-import ru.ifmo.ctd.novik.phylogeny.models.TCSModel
+import ru.ifmo.ctd.novik.phylogeny.models.*
+import java.util.logging.Logger
 
 enum class PhylogeneticModel(val shortName: String) {
     BASE_TCS("baseTCS"),
     BRUTE_FORCE_TCS("bfTCS"),
-    SET_BRUTE_FORCE_TCS("setBfTCS");
+    SET_BRUTE_FORCE_TCS("setBfTCS"),
+    MCMC("mcmc");
 
     override fun toString(): String = shortName
 }
-
-class ModelCreationFailureException(model: PhylogeneticModel) : RuntimeException("Can't create $model model")
 
 fun PhylogeneticModel.create(): IModel {
     return when (this) {
         PhylogeneticModel.BASE_TCS -> TCSModel(RealClusterDistanceEvaluator(CachingTaxonDistanceEvaluator(PrimaryTaxonDistanceEvaluator())))
         PhylogeneticModel.BRUTE_FORCE_TCS -> BruteForceTCSModel(RealClusterDistanceEvaluator(PrimaryTaxonDistanceEvaluator()))
         PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(AbsoluteClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator()))
-        else -> throw ModelCreationFailureException(this)
+        PhylogeneticModel.MCMC -> MCMCModel()
     }
 }
 
@@ -40,11 +38,16 @@ object ModelChoice : ArgType<PhylogeneticModel>(true) {
         get() = { value, _ -> PhylogeneticModel.values().find { model -> model.shortName == value } ?: PhylogeneticModel.BASE_TCS }
 }
 
+fun String.readSimpleData(): List<Taxon> = SimpleInputTaxaReader().readFile(this)
+
 fun IModel.evaluateSimpleData(dataFile: String): Phylogeny {
     val reader = SimpleInputTaxaReader()
     val taxonList = reader.readFile(dataFile)
 
-    val phylogeny = this.computeTree(taxonList)
+    val phylogeny = this.computePhylogeny(taxonList)
     phylogeny.unify()
     return phylogeny
 }
+
+inline fun <reified R : Any> R.logger(): Logger =
+        Logger.getLogger(this::class.java.name)

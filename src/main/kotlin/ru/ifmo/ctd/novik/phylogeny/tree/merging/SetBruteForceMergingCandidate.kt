@@ -25,7 +25,12 @@ class SetBruteForceMergingCandidate(
     override val mergeMetric: MergeMetric
         get() = TODO("not implemented")
 
+    companion object {
+        val log = logger()
+    }
+
     override fun merge(): MergingResult {
+        val mergeStartTime = System.currentTimeMillis()
         val nodes = mutableListOf<Node>()
         nodes.addAll(firstCluster)
         nodes.addAll(secondCluster)
@@ -37,24 +42,22 @@ class SetBruteForceMergingCandidate(
         specify(minimum.second, firstGraphDistances)
 
         val newNodesGenomes = Array<MutableSet<String>>(minimum.distance.value - 1) { mutableSetOf() }
-        minimum.first.taxon.genome.forEach { firstGenome ->
-            minimum.second.taxon.genome.forEach { secondGenome ->
-                val positions = computeDistinctPositions(firstGenome, secondGenome)
-                permutations(distance.value).map {
-                    val builder = StringBuilder(firstGenome)
-                    it.map { index ->
-                        builder[positions[index]] = secondGenome[positions[index]]
-                        builder.toString()
-                    }
-                }.forEach { genomes ->
-                    val good = genomes.mapIndexed { index, genome ->
-                        isCorrect(genome, firstGraphDistances, index + 1)
-                        && isCorrect(genome, secondGraphDistances, distance.value - index - 1)
-                    }.all { it }
-                    if (good)
-                        newNodesGenomes.forEachIndexed { index, set -> set.add(genomes[index]) }
-                }
+        val firstGenome = minimum.distance.firstGenome
+        val secondGenome = minimum.distance.secondGenome
+        val positions = computeDistinctPositions(firstGenome, secondGenome)
+        permutations(distance.value).map {
+            val builder = StringBuilder(firstGenome)
+            it.map { index ->
+                builder[positions[index]] = secondGenome[positions[index]]
+                builder.toString()
             }
+        }.forEach { genomes ->
+            val good = genomes.mapIndexed { index, genome ->
+                isCorrect(genome, firstGraphDistances, index + 1)
+                        && isCorrect(genome, secondGraphDistances, distance.value - index - 1)
+            }.all { it }
+            if (good)
+                newNodesGenomes.forEachIndexed { index, set -> set.add(genomes[index]) }
         }
 
         val newNodes = mutableListOf<Node>()
@@ -66,6 +69,9 @@ class SetBruteForceMergingCandidate(
             newNodes.add(minimum.first)
             newNodes.add(minimum.second)
         }
+
+        val mergeEndTime = System.currentTimeMillis()
+        log.info { "Clusters merged in ${(mergeEndTime - mergeStartTime) / 1_000.0} seconds" }
 
         return MergingResult(SimpleCluster(nodes), Branch(newNodes))
     }
@@ -109,4 +115,6 @@ class SetBruteForceMergingCandidate(
             }
         }
     }
+
+    override fun toString(): String = "SET_BRUTE_FORCE_MERGING_CANDIDATE { Cluster distance: ${distance.value} }"
 }

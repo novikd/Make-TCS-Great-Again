@@ -22,6 +22,8 @@ internal object EmptyMergingCandidate : MergingCandidate {
             throw MergingException("Can't merge empty candidate")
 
     override fun compareTo(other: MergingCandidate): Int = if (other == this) 0 else -1
+
+    override fun toString(): String = "EMPTY_MERGING_CANDIDATE"
 }
 
 internal object EmptyMergingBridge : IMergingBridge {

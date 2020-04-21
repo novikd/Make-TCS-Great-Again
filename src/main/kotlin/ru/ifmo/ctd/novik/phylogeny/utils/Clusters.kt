@@ -2,10 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 
 import ru.ifmo.ctd.novik.phylogeny.common.*
 import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
-import ru.ifmo.ctd.novik.phylogeny.tree.Edge
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.Topology
-import ru.ifmo.ctd.novik.phylogeny.tree.TopologyNode
+import ru.ifmo.ctd.novik.phylogeny.tree.*
 import java.util.*
 
 fun Cluster.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
@@ -77,7 +74,7 @@ fun Cluster.topology(): Topology {
         }
     }
 
-    return Topology(hubs.values.toList(), edges)
+    return Topology(this, hubs.values.toList(), edges)
 }
 
 fun Cluster.label(): Cluster {
@@ -255,6 +252,8 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
 
     return this
 }
+
+fun Topology.toRooted(): RootedTopology = RootedTopology(this, nodes.random())
 
 typealias Path = MutableList<Node>
 
