@@ -5,6 +5,7 @@ package ru.ifmo.ctd.novik.phylogeny.common
  */
 interface IGenome : Iterable<String> {
     val primary: String
+    val size: Int
 
     val isEmpty: Boolean
     val isReal: Boolean

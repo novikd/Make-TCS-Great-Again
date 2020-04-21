@@ -24,7 +24,9 @@ class MutableGenome() : IGenome {
 
     fun remove(genome: String) = genomeOptions.remove(genome)
 
-    val size: Int
+    fun removeIf(predicate: (String.() -> Boolean)) = genomeOptions.removeIf(predicate)
+
+    override val size: Int
         get() = genomeOptions.size
 
     override fun toString(): String {

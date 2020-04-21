@@ -36,28 +36,33 @@ class SetBruteForceMergingCandidate(
         nodes.addAll(secondCluster)
 
         val minimum = distance.minimumPoints.first()
-        val firstGraphDistances = minimum.first.computeAllGraphDistances()
-        val secondGraphDistances = minimum.second.computeAllGraphDistances()
-        specify(minimum.first, secondGraphDistances)
-        specify(minimum.second, firstGraphDistances)
+        val firstGraphDistances = minimum.first.computeGraphDistancesToAllTerminals()
+        val secondGraphDistances = minimum.second.computeGraphDistancesToAllTerminals()
+
+        val firstGenome = minimum.first.genome
+        if (firstGenome is MutableGenome) {
+            firstGenome.removeIf { minimum.distance.genomes.none { (genome, _) -> this == genome } }
+        }
+        val secondGenome = minimum.second.genome
+        if (secondGenome is MutableGenome) {
+            secondGenome.removeIf { minimum.distance.genomes.none { (_, genome) -> this == genome } }
+        }
+
+        specify(minimum.first, firstGraphDistances)
+        specify(minimum.second, secondGraphDistances)
 
         val newNodesGenomes = Array<MutableSet<String>>(minimum.distance.value - 1) { mutableSetOf() }
-        val firstGenome = minimum.distance.firstGenome
-        val secondGenome = minimum.distance.secondGenome
-        val positions = computeDistinctPositions(firstGenome, secondGenome)
-        permutations(distance.value).map {
-            val builder = StringBuilder(firstGenome)
-            it.map { index ->
-                builder[positions[index]] = secondGenome[positions[index]]
-                builder.toString()
-            }
-        }.forEach { genomes ->
-            val good = genomes.mapIndexed { index, genome ->
-                isCorrect(genome, firstGraphDistances, index + 1)
-                        && isCorrect(genome, secondGraphDistances, distance.value - index - 1)
-            }.all { it }
-            if (good)
+        minimum.distance.forEach { (firstGenome, secondGenome) ->
+            val positions = computeDistinctPositions(firstGenome, secondGenome)
+            permutations(distance.value).map {
+                val builder = StringBuilder(firstGenome)
+                it.map { index ->
+                    builder[positions[index]] = secondGenome[positions[index]]
+                    builder.toString()
+                }
+            }.forEach { genomes ->
                 newNodesGenomes.forEachIndexed { index, set -> set.add(genomes[index]) }
+            }
         }
 
         val newNodes = mutableListOf<Node>()
@@ -85,33 +90,12 @@ class SetBruteForceMergingCandidate(
     }
 
     private fun specify(node: Node, graphDistances: Map<Node, Int>) {
-        val queue = ArrayDeque<Pair<Node, Int>>()
-        val visited = mutableSetOf<Node>()
-        queue.add(node to 0)
-        visited.add(node)
-
-        while (queue.isNotEmpty()) {
-            val (current, distanceOffset) = queue.pop()
-            val genome = current.taxon.genome
-            if (genome is MutableGenome) {
-                genome.filter { currentGenome ->
-                    !isCorrect(currentGenome, graphDistances, distance.value + distanceOffset)
-                }.forEach {
-                    genome.remove(it)
-                }
-            }
-            for (neighbor in current.neighbors) {
-                if (visited.contains(neighbor)) continue
-                queue.add(neighbor to distanceOffset + 1)
-                visited.add(neighbor)
-            }
-        }
-    }
-
-    private fun isCorrect(currentGenome: String, graphDistances: Map<Node, Int>, distanceOffset: Int): Boolean {
-        return graphDistances.all { (otherNode, graphDistance) ->
-            otherNode.taxon.genome.isEmpty || otherNode.taxon.genome.any { otherGenome ->
-                hammingDistance(currentGenome, otherGenome) == graphDistance + distanceOffset
+        graphDistances.forEach { (graphNode, distance) ->
+            if (graphNode == node)
+                return
+            val genome = graphNode.genome as MutableGenome
+            genome.removeIf {
+                node.genome.none { currentGenome -> hammingDistance(this, currentGenome) == distance }
             }
         }
     }

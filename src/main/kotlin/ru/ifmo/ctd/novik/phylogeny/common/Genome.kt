@@ -7,6 +7,9 @@ data class Genome(override val primary: String) : IGenome {
     override val isReal: Boolean
         get() = true
 
+    override val size: Int
+        get() = 1
+
     override val isEmpty: Boolean
         get() = false
 

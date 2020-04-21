@@ -266,7 +266,7 @@ fun createEdge(v: Node, u: Node, directed: Boolean = false) {
 val Node.genome: IGenome
     get() = taxon.genome
 
-fun Node.computeAllGraphDistances(): Map<Node, Int> {
+inline fun Node.computeAllGraphDistances(predicate: (Node.() -> Boolean) = { true }): Map<Node, Int> {
     val result = hashMapOf<Node, Int>()
     result[this] = 0
 
@@ -277,8 +277,7 @@ fun Node.computeAllGraphDistances(): Map<Node, Int> {
         val currentNode = queue.poll()
         val currentDistance = result[currentNode]!!
         for (neighbor in currentNode.neighbors) {
-
-            if (!result.contains(neighbor)) {
+            if (!result.contains(neighbor) && predicate(neighbor)) {
                 result[neighbor] = currentDistance + 1
                 queue.add(neighbor)
             }
@@ -287,5 +286,7 @@ fun Node.computeAllGraphDistances(): Map<Node, Int> {
 
     return result
 }
+
+fun Node.computeGraphDistancesToAllTerminals(): Map<Node, Int> = this.computeAllGraphDistances { genome.size > 1 }
 
 fun Node.computeGraphDistances(): Map<Node, Int> = this.computeAllGraphDistances().filterKeys { x -> x.isRealTaxon }

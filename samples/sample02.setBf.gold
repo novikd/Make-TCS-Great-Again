@@ -1,9 +1,9 @@
 graph G {
-"AAAAA" -- "intermediate1{unknown genome}"
-"intermediate1{unknown genome}" -- "AAACT"
-"AAACT" -- "intermediate2{unknown genome}"
-"intermediate2{unknown genome}" -- "intermediate3{unknown genome}"
-"intermediate3{unknown genome}" -- "intermediate4{unknown genome}"
-"intermediate4{unknown genome}" -- "GGAGC"
-"intermediate4{unknown genome}" -- "GGGCC"
+"AAAAA" -- "intermediate1{AAACA}"
+"intermediate1{AAACA}" -- "AAACT"
+"AAACT" -- "intermediate2{GAACT}"
+"intermediate2{GAACT}" -- "intermediate3{GGACT}"
+"intermediate3{GGACT}" -- "intermediate4{GGACC}"
+"intermediate4{GGACC}" -- "GGAGC"
+"intermediate4{GGACC}" -- "GGGCC"
 }
