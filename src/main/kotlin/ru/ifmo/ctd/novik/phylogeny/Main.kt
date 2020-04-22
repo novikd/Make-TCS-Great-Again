@@ -5,6 +5,7 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.required
 import ru.ifmo.ctd.novik.phylogeny.utils.*
+import java.io.File
 import java.util.logging.LogManager
 
 /**
@@ -22,6 +23,16 @@ fun main(args: Array<String>) {
     parser.parse(args)
 
     val model = phylogeneticModel.create()
-//    val phylogeneticTree = model.evaluateSimpleData(input)
-    print(model.computeTopology(input.readSimpleData()).topology.toGraphviz())
+    when (File(input).extension) {
+        "fas" -> {
+            val topology = model.computeForFastaData(input)
+            print(topology.topology.toGraphviz())
+        }
+        else -> {
+            val phylogeneticTree = model.evaluateSimpleData(input)
+            phylogeneticTree.unify()
+            print(phylogeneticTree.cluster.toGraphviz())
+        }
+    }
+
 }

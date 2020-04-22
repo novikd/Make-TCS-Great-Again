@@ -36,20 +36,13 @@ class SetBruteForceMergingCandidate(
         nodes.addAll(secondCluster)
 
         val minimum = distance.minimumPoints.first()
-        val firstGraphDistances = minimum.first.computeGraphDistancesToAllTerminals()
-        val secondGraphDistances = minimum.second.computeGraphDistancesToAllTerminals()
 
-        val firstGenome = minimum.first.genome
-        if (firstGenome is MutableGenome) {
-            firstGenome.removeIf { minimum.distance.genomes.none { (genome, _) -> this == genome } }
-        }
-        val secondGenome = minimum.second.genome
-        if (secondGenome is MutableGenome) {
-            secondGenome.removeIf { minimum.distance.genomes.none { (_, genome) -> this == genome } }
-        }
+        val (firstGenomes, secondGenomes) = minimum.distance.genomes.unzip()
+        updateGenomes(minimum.first, firstGenomes)
+        updateGenomes(minimum.second, secondGenomes)
 
-        specify(minimum.first, firstGraphDistances)
-        specify(minimum.second, secondGraphDistances)
+        specify(minimum.first)
+        specify(minimum.second)
 
         val newNodesGenomes = Array<MutableSet<String>>(minimum.distance.value - 1) { mutableSetOf() }
         minimum.distance.forEach { (firstGenome, secondGenome) ->
@@ -81,22 +74,51 @@ class SetBruteForceMergingCandidate(
         return MergingResult(SimpleCluster(nodes), Branch(newNodes))
     }
 
+    private fun updateGenomes(node: Node, firstGenomes: List<String>) {
+        node.genome.let {
+            if (it is MutableGenome) {
+                it.replace(firstGenomes)
+            }
+        }
+    }
+
     override fun compareTo(other: MergingCandidate): Int {
         if (other == emptyMergingCandidate())
+            return 1
+        if (other is SimpleMergingCandidate)
             return 1
         if (other !is SetBruteForceMergingCandidate)
             throw MergingException("Cannot compare candidates: $this and $other")
         return other.distance.value.compareTo(distance.value)
     }
 
-    private fun specify(node: Node, graphDistances: Map<Node, Int>) {
-        graphDistances.forEach { (graphNode, distance) ->
-            if (graphNode == node)
-                return
-            val genome = graphNode.genome as MutableGenome
-            genome.removeIf {
-                node.genome.none { currentGenome -> hammingDistance(this, currentGenome) == distance }
+    private fun specify(start: Node) {
+        val queue = ArrayDeque<Node>()
+        val visited: MutableSet<Node> = mutableSetOf()
+        queue.add(start)
+        visited.add(start)
+
+        while (queue.isNotEmpty()) {
+            val node = queue.pop()
+
+            node.neighbors.forEach { neighbor ->
+                if (neighbor !in visited) {
+                    if (neighbor.genome.size > 1) {
+                        update(node, neighbor)
+                        visited.add(neighbor)
+                        queue.add(neighbor)
+                    }
+                } else {
+                    // TODO: update with respect to already visited node
+                }
             }
+        }
+    }
+
+    private fun update(parent: Node, child: Node) {
+        val mutableGenome = child.genome as MutableGenome
+        mutableGenome.removeIf {
+            parent.genome.none { parentGenome -> hammingDistance(this, parentGenome) == 1 }
         }
     }
 

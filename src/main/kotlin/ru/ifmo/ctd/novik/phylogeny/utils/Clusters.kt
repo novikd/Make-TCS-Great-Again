@@ -125,7 +125,7 @@ fun Cluster.label(): Cluster {
 
         genome.add(buildString(length) {
             array.forEach { set ->
-                this.append(set.random())
+                this.append(set.random(GlobalRandom))
             }
         })
     }
@@ -139,7 +139,7 @@ fun Cluster.label(): Cluster {
             val genome = neighbor.genome as MutableGenome
             genome.add(buildString(length) {
                 nodeGenome.forEachIndexed { index, c ->
-                    this.append(if (c in array[index]) c else array[index].random()) // TODO: it works not so well
+                    this.append(if (c in array[index]) c else array[index].random(GlobalRandom)) // TODO: it works not so well
                 }
             })
 
@@ -152,7 +152,7 @@ fun Cluster.label(): Cluster {
 }
 
 fun Phylogeny.directed(): RootedPhylogeny {
-    val root = branches.last().nodes.random()
+    val root = branches.last().nodes.random(GlobalRandom)
 
     val queue = ArrayDeque<Node>()
     val visited = mutableSetOf<Node>()
@@ -217,7 +217,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
 
             genome.add(buildString(length) {
                 array.forEach { set ->
-                    this.append(set.random())
+                    this.append(set.random(GlobalRandom))
                 }
             })
         }
@@ -241,7 +241,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
                                 if (nodeGenome[index] in set)
                                     append(nodeGenome[index])
                                 else
-                                    append(set.random())
+                                    append(set.random(GlobalRandom))
                             }
                         })
                     }
@@ -253,7 +253,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
     return this
 }
 
-fun Topology.toRooted(): RootedTopology = RootedTopology(this, nodes.random())
+fun Topology.toRooted(): RootedTopology = RootedTopology(this, nodes.random(GlobalRandom))
 
 typealias Path = MutableList<Node>
 
