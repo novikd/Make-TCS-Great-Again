@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.Likelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.Modification
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
 import kotlin.random.Random
 
@@ -20,13 +21,15 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
         var currentTopology = startTopology
         var currentLikelihood = likelihood(currentTopology)
 
+        log.info { "\n******* START MCMC SIMULATION *******\n" }
+
         while (!shouldStop()) {
             ++iter
-            val modification = modifications.random()
+            val modification = modifications.random(GlobalRandom)
             val newTopology = modification(currentTopology.clone())
             val newLikelihood = likelihood(newTopology)
 
-            if (newLikelihood > currentLikelihood || Random.nextDouble() > 0.5) {
+            if (newLikelihood > currentLikelihood || GlobalRandom.nextDouble() > 0.5) {
                 currentTopology = newTopology
                 currentLikelihood = newLikelihood
             }

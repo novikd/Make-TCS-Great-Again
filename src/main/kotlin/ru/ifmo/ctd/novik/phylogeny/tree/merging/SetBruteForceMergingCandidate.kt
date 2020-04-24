@@ -44,24 +44,32 @@ class SetBruteForceMergingCandidate(
         specify(minimum.first)
         specify(minimum.second)
 
-        val newNodesGenomes = Array<MutableSet<String>>(minimum.distance.value - 1) { mutableSetOf() }
+        val newNodesGenomes = Array<MutableSet<String>>(minimum.distance.value) { mutableSetOf() }
+        newNodesGenomes[0].addAll(firstGenomes)
+
         minimum.distance.forEach { (firstGenome, secondGenome) ->
             val positions = computeDistinctPositions(firstGenome, secondGenome)
-            permutations(distance.value).map {
-                val builder = StringBuilder(firstGenome)
-                it.map { index ->
-                    builder[positions[index]] = secondGenome[positions[index]]
-                    builder.toString()
+
+            for (i in 1 until minimum.distance.value) {
+                val current = newNodesGenomes[i]
+                newNodesGenomes[i - 1].forEach { genome ->
+                    positions.forEach { position ->
+                        if (genome[position] != secondGenome[position]) {
+                            val builder = StringBuilder(genome)
+                            builder[position] = secondGenome[position]
+                            current.add(builder.toString())
+                        }
+                    }
                 }
-            }.forEach { genomes ->
-                newNodesGenomes.forEachIndexed { index, set -> set.add(genomes[index]) }
             }
         }
 
         val newNodes = mutableListOf<Node>()
         MergingBridge(minimum.first, minimum.second, minimum.distance.value, 0).build(newNodes)
-        newNodes.forEachIndexed { index, node -> (node.taxon.genome as MutableGenome).addAll(newNodesGenomes[index]) }
+        newNodes.forEachIndexed { index, node -> (node.taxon.genome as MutableGenome).addAll(newNodesGenomes[index + 1]) }
         nodes.addAll(newNodes)
+
+        log.info { "Created ${newNodesGenomes.map { it.size }.sum()} new genomes" }
 
         if (newNodes.isEmpty()) {
             newNodes.add(minimum.first)
@@ -74,13 +82,7 @@ class SetBruteForceMergingCandidate(
         return MergingResult(SimpleCluster(nodes), Branch(newNodes))
     }
 
-    private fun updateGenomes(node: Node, firstGenomes: List<String>) {
-        node.genome.let {
-            if (it is MutableGenome) {
-                it.replace(firstGenomes)
-            }
-        }
-    }
+    private fun updateGenomes(node: Node, genomes: List<String>) = (node.genome as? MutableGenome)?.replace(genomes)
 
     override fun compareTo(other: MergingCandidate): Int {
         if (other == emptyMergingCandidate())

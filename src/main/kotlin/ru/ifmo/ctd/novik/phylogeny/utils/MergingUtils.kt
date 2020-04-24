@@ -6,7 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.*
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
 
-internal const val BRUTE_FORCE_DISTANCE_THRESHOLD = 6
+internal const val BRUTE_FORCE_DISTANCE_THRESHOLD = 11
 
 internal object EmptyMergingCandidate : MergingCandidate {
     override val firstCluster: Cluster

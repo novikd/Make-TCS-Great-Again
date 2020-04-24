@@ -6,10 +6,12 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.AbsoluteClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.AbsoluteTaxonDistanceEvaluator
-import ru.ifmo.ctd.novik.phylogeny.distance.taxa.CachingTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.PrimaryTaxonDistanceEvaluator
+import ru.ifmo.ctd.novik.phylogeny.distance.toCaching
+import ru.ifmo.ctd.novik.phylogeny.io.input.FastaInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.io.input.SimpleInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.models.*
+import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import java.util.logging.Logger
 
 enum class PhylogeneticModel(val shortName: String) {
@@ -21,12 +23,12 @@ enum class PhylogeneticModel(val shortName: String) {
     override fun toString(): String = shortName
 }
 
-fun PhylogeneticModel.create(): IModel {
+fun PhylogeneticModel.create(hotspots: List<Int> = listOf()): IModel {
     return when (this) {
-        PhylogeneticModel.BASE_TCS -> TCSModel(RealClusterDistanceEvaluator(CachingTaxonDistanceEvaluator(PrimaryTaxonDistanceEvaluator())))
+        PhylogeneticModel.BASE_TCS -> TCSModel(RealClusterDistanceEvaluator(PrimaryTaxonDistanceEvaluator().toCaching()))
         PhylogeneticModel.BRUTE_FORCE_TCS -> BruteForceTCSModel(RealClusterDistanceEvaluator(PrimaryTaxonDistanceEvaluator()))
-        PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(AbsoluteClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator()))
-        PhylogeneticModel.MCMC -> MCMCModel()
+        PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(AbsoluteClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator().toCaching()))
+        PhylogeneticModel.MCMC -> MCMCModel(hotspots)
     }
 }
 
@@ -49,5 +51,13 @@ fun IModel.evaluateSimpleData(dataFile: String): Phylogeny {
     return phylogeny
 }
 
+fun IModel.computeForFastaData(dataFile: String): RootedTopology {
+    val reader = FastaInputTaxaReader()
+    val taxonList = reader.readFile(dataFile).distinctBy { it.genome.primary }
+
+    return this.computeTopology(taxonList)
+}
+
 inline fun <reified R : Any> R.logger(): Logger =
         Logger.getLogger(this::class.java.name)
+

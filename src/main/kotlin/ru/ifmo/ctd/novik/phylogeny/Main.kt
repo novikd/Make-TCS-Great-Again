@@ -22,7 +22,9 @@ fun main(args: Array<String>) {
 
     parser.parse(args)
 
-    val model = phylogeneticModel.create()
+    val hotspots by ConfigurationDelegate()
+
+    val model = phylogeneticModel.create(hotspots)
     when (File(input).extension) {
         "fas" -> {
             val topology = model.computeForFastaData(input)

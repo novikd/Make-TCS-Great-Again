@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
 
 class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
@@ -12,8 +13,10 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
     }
 
     override fun invoke(topology: RootedTopology): RootedTopology {
-        val hotspotPosition = (0 until hotspots.size).random()
+        val hotspotPosition = (0 until hotspots.size).random(GlobalRandom)
         val hotspot = hotspots[hotspotPosition]
+
+        log.info { "Looking for recombination at $hotspot site" }
 
         val genomes = topology.genomes
         val length = genomes.first().second.length

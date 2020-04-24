@@ -13,7 +13,7 @@ import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.NNIModification
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
-class MCMCModel : IModel {
+class MCMCModel(val hotspots: List<Int>) : IModel {
     override fun computePhylogeny(taxonList: List<Taxon>): Phylogeny {
         TODO("Not yet implemented")
     }
@@ -24,10 +24,10 @@ class MCMCModel : IModel {
         phylogeny.unify()
 
         val baseTopology = phylogeny.cluster.topology()
+        baseTopology.cluster.label()
         val length = phylogeny.cluster.terminals.first().genome.primary.length
         val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood()
-        val hotspots = mutableListOf<Int>(2)
-        val modifications = listOf(ChangeRootModification(), NNIModification(), HotspotMoveModification(hotspots))
+        val modifications = listOf(ChangeRootModification(), NNIModification(), HotspotMoveModification(hotspots.toMutableList()))
         val mcmc = MCMC(likelihood, modifications)
         return mcmc.simulation(baseTopology.toRooted())
     }

@@ -108,7 +108,7 @@ fun Cluster.label(): Cluster {
                 }
                 labels[neighbor] = entry
                 queue.add(neighbor)
-                if (unprocessed == 0)
+                if (unprocessed == 0 && neighbor.genome.size == 0)
                     labelingQueue.add(neighbor)
             }
 
