@@ -1,38 +1,100 @@
 package ru.ifmo.ctd.novik.phylogeny.tree
 
+import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
 import ru.ifmo.ctd.novik.phylogeny.utils.genome
+import ru.ifmo.ctd.novik.phylogeny.utils.logger
+import ru.ifmo.ctd.novik.phylogeny.utils.split
 
-data class RootedTopology(val topology: Topology, val root: TopologyNode) {
+data class RootedTopology(
+        val topology: Topology,
+        val root: TopologyNode,
+        val recombinationGroups: MutableList<RecombinationGroup> = mutableListOf()
+) {
 
     val nodes: List<TopologyNode>
         get() = topology.nodes
 
     val edges: List<Edge>
-        get() = collectEdges(root)
+        get() = topology.flatMap { it.next }
 
     val genomes: List<Pair<Node, String>>
         get() = topology.cluster.map { node -> node to node.genome.primary }
 
-    fun clone(): RootedTopology {
-        val newTopology = topology.clone()
-        val newRoot = newTopology.find { node -> node.node.taxon === root.node.taxon }!!
-        return RootedTopology(newTopology, newRoot)
+    companion object {
+        val log = logger()
     }
 
-    private fun collectEdges(node: TopologyNode,
-                             prev: TopologyNode? = null,
-                             visited: MutableSet<TopologyNode> = mutableSetOf()): List<Edge> {
-        visited.add(node)
-        val result = mutableListOf<Edge>()
+    fun clone(): RootedTopology {
+        val (newTopology, generation, topGeneration) = topology.clone()
+        val newRoot = newTopology.find { node -> node.node.taxon === root.node.taxon }!!
 
-        node.edges.forEach { edge ->
-            if (edge.end !in visited) {
-                result.addAll(collectEdges(edge.end, node, visited))
-            }
-            if (edge.end != prev) {
-                result.add(edge)
-            }
+        edges.forEach { edge ->
+            val newStart = topGeneration[edge.start]!!
+            val newEnd = topGeneration[edge.end]!!
+            val newEdge = newStart.edges.first { it.end === newEnd }
+            newStart.next.add(newEdge)
         }
-        return result
+
+        val newRecombinationGroups = mutableListOf<RecombinationGroup>()
+        recombinationGroups.forEach { group ->
+            val newElements = mutableListOf<Recombination>()
+            group.elements.forEach {
+                newElements.add(Recombination(
+                        generation[it.firstParent]!!,
+                        generation[it.secondParent]!!,
+                        generation[it.child]!!,
+                        it.pos))
+            }
+
+            val newGroup = group.copy(elements = newElements)
+            if (group.isUsed != newGroup.isUsed)
+                error("Group usage info lost")
+            newRecombinationGroups.add(newGroup)
+        }
+
+        val newRootedTopology = RootedTopology(newTopology, newRoot, newRecombinationGroups)
+        if (edges.size != newRootedTopology.edges.size)
+            error("Edges number must be equal")
+        newRootedTopology.checkInvariant()
+        return newRootedTopology
+    }
+
+    fun add(recombination: Recombination): RecombinationGroup {
+        val group = getRecombinationGroup(recombination)
+
+        group.add(recombination)
+        return group
+    }
+
+    fun getOrCreateNode(node: Node): TopologyNode {
+        val topologyNode = nodes.find { it.node === node }
+        if (topologyNode != null) {
+            return topologyNode
+        }
+
+        val containingEdge = edges.first { it.contains(node) }
+        topology.remove(containingEdge)
+        val (newNode, inEdge, revInEdge, outEdge, revOutEdge) = containingEdge.split(node)
+        topology.nodes.add(newNode)
+        topology.add(Pair(inEdge, revInEdge))
+        topology.add(Pair(outEdge, revOutEdge))
+        return newNode
+    }
+
+    private fun getRecombinationGroup(recombination: Recombination): RecombinationGroup {
+        val group = recombinationGroups.find { recombination in it }
+        if (group != null) {
+            log.info {
+                "Reuse recombination group: { ${recombination.firstParent.nodeName} + ${recombination.secondParent.nodeName} -> ${recombination.child.nodeName} }"
+            }
+            return group
+        }
+
+        log.info {
+            "New recombination group: { ${recombination.firstParent.nodeName} + ${recombination.secondParent.nodeName} -> ${recombination.child.nodeName} }"
+        }
+        val newGroup = RecombinationGroup(recombination.pos)
+        recombinationGroups.add(newGroup)
+        return newGroup
     }
 }

@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
     when (File(input).extension) {
         "fas" -> {
             val topology = model.computeForFastaData(input)
-            print(topology.topology.toGraphviz())
+            print(topology.toGraphviz())
         }
         else -> {
             val phylogeneticTree = model.evaluateSimpleData(input)

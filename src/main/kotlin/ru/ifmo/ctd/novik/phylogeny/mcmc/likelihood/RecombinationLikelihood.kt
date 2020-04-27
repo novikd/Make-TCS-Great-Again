@@ -2,8 +2,9 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood
 
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 
-class RecombinationLikelihood : Likelihood {
+class RecombinationLikelihood(val hotspots: List<Int>) : Likelihood {
     override fun invoke(topology: RootedTopology): Double {
-        return 0.0
+        val usedHotspots = topology.recombinationGroups.filter { it.isUsed }.map { it.hotspot }.toSet().size
+        return -usedHotspots.toDouble()
     }
 }

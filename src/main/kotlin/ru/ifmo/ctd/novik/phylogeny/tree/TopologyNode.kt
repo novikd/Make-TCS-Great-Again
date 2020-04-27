@@ -10,11 +10,24 @@ data class TopologyNode(val node: Node) {
     val edges: MutableList<Edge>
         get() = myEdges
 
-    fun add(edge: Edge) = myEdges.add(edge)
+    fun add(edge: Edge, directed: Boolean = false) {
+        if ((edge.length < 1)) {
+            error("Edge length must be at least 1")
+        }
+        myEdges.add(edge)
+        if (directed)
+            next.add(edge)
+    }
 
-    fun remove(edge: Edge) = myEdges.remove(edge)
+    fun remove(edge: Edge) {
+        myEdges.remove(edge)
+        next.remove(edge)
+    }
 
-    fun removeIf(predicate: (Edge.() -> Boolean)) = myEdges.removeIf(predicate)
+    fun removeIf(predicate: ((Edge) -> Boolean)) {
+        myEdges.removeIf(predicate)
+        next.removeIf(predicate)
+    }
 
     override fun toString(): String = "NODE: $node"
 }

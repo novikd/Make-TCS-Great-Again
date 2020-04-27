@@ -26,7 +26,7 @@ class MCMCModel(val hotspots: List<Int>) : IModel {
         val baseTopology = phylogeny.cluster.topology()
         baseTopology.cluster.label()
         val length = phylogeny.cluster.terminals.first().genome.primary.length
-        val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood()
+        val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood(hotspots)
         val modifications = listOf(ChangeRootModification(), NNIModification(), HotspotMoveModification(hotspots.toMutableList()))
         val mcmc = MCMC(likelihood, modifications)
         return mcmc.simulation(baseTopology.toRooted())

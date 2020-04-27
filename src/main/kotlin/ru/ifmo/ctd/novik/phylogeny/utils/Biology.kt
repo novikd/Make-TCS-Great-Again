@@ -28,3 +28,11 @@ fun computeDistinctPositions(firstTaxon: Taxon, secondTaxon: Taxon): List<Int> {
     return computeDistinctPositions(firstGenome, secondGenome)
 }
 
+fun computeDifference(firstGenome: IGenome, secondGenome: IGenome): Set<Pair<Int, Char>> {
+    val result = mutableSetOf<Pair<Int, Char>>()
+    for (i in firstGenome.primary.indices) {
+        if (firstGenome.primary[i] != secondGenome.primary[i])
+            result.add(Pair(i, secondGenome.primary[i]))
+    }
+    return result
+}

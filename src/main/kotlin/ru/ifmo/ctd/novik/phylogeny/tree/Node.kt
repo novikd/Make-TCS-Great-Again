@@ -51,7 +51,7 @@ data class Node(val taxon: Taxon) {
         }
 
     override fun toString(): String {
-        return if (isRealTaxon) taxon.genome.toString() else "$nodeName{${taxon.genome}}"
+        return nodeName
     }
 }
 

@@ -5,13 +5,13 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
 /**
  * @author Novik Dmitry ITMO University
  */
-class SimpleCluster(override val nodes: List<Node>) : Cluster {
+class SimpleCluster(override val nodes: MutableList<Node>) : Cluster {
     override val terminals: List<Node>
         get() = nodes.filter(Node::isRealTaxon)
 
-    constructor(taxon: Taxon) : this(listOf(Node(taxon)))
+    constructor(taxon: Taxon) : this(mutableListOf(Node(taxon)))
 
-    override fun clone(): Cluster {
+    override fun clone(): ClusterCloneResult {
         val generation = mutableMapOf<Node, Node>()
         val newNodes = mutableListOf<Node>()
         nodes.forEach { node ->
@@ -20,12 +20,16 @@ class SimpleCluster(override val nodes: List<Node>) : Cluster {
             newNodes.add(newNode)
         }
 
-        generation.forEach { old, new ->
+        generation.forEach { (old, new) ->
             new.neighbors.addAll(old.neighbors.map { generation[it]!! })
             new.next.addAll(old.next.map { generation[it]!! })
         }
 
-        return SimpleCluster(newNodes)
+        val invariant = generation.all { (old, new) -> old.neighbors.size == new.neighbors.size && old.next.size == new.next.size }
+        if (!invariant)
+            error("Cluster clone error")
+
+        return ClusterCloneResult(SimpleCluster(newNodes), generation)
     }
 
     override fun iterator(): Iterator<Node> = nodes.iterator()

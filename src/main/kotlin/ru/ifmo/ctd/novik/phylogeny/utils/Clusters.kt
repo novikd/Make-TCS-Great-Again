@@ -8,6 +8,7 @@ import java.util.*
 fun Cluster.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
 fun Topology.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
 fun RootedPhylogeny.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
+fun RootedTopology.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
 
 fun Cluster.traverse(action: (Node.() -> Unit)) {
     val visited = mutableSetOf<Node>()
@@ -74,7 +75,7 @@ fun Cluster.topology(): Topology {
         }
     }
 
-    return Topology(this, hubs.values.toList(), edges)
+    return Topology(this, hubs.values.toMutableList(), edges)
 }
 
 fun Cluster.label(): Cluster {
@@ -253,7 +254,28 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
     return this
 }
 
-fun Topology.toRooted(): RootedTopology = RootedTopology(this, nodes.random(GlobalRandom))
+fun Topology.toRooted(root: TopologyNode = nodes.random(GlobalRandom)): RootedTopology {
+    val queue = ArrayDeque<Pair<TopologyNode, TopologyNode>>()
+    val visited = mutableSetOf<TopologyNode>()
+    queue.add(Pair(root, root))
+
+    while (queue.isNotEmpty()) {
+        val (node, prev) = queue.pop()
+        visited.add(node)
+
+        node.edges.forEach { edge ->
+            if (edge.end != prev) {
+                if (edge.end !in visited) {
+                    queue.add(Pair(edge.end, node))
+                    visited.add(edge.end)
+                }
+                node.next.add(edge)
+            }
+        }
+    }
+
+    return RootedTopology(this, root)
+}
 
 typealias Path = MutableList<Node>
 
@@ -265,6 +287,9 @@ fun createEdge(v: Node, u: Node, directed: Boolean = false) {
 
 val Node.genome: IGenome
     get() = taxon.genome
+
+val TopologyNode.genome: IGenome
+    get() = node.genome
 
 inline fun Node.computeAllGraphDistances(predicate: (Node.() -> Boolean) = { true }): Map<Node, Int> {
     val result = hashMapOf<Node, Int>()
@@ -287,6 +312,66 @@ inline fun Node.computeAllGraphDistances(predicate: (Node.() -> Boolean) = { tru
     return result
 }
 
-fun Node.computeGraphDistancesToAllTerminals(): Map<Node, Int> = this.computeAllGraphDistances { genome.size > 1 }
-
 fun Node.computeGraphDistances(): Map<Node, Int> = this.computeAllGraphDistances().filterKeys { x -> x.isRealTaxon }
+
+fun checkNode(node: Node, edges: List<Edge>): Boolean = !edges.any { edge -> edge.contains(node) }
+
+fun Topology.checkInvariant(edgeList: List<Edge> = edges.map { it.first }): Boolean {
+    val value = cluster.nodes.find { node -> checkNode(node, edgeList) }
+    if (value != null)
+        error("Can't find containing edge for $value")
+    return true
+}
+
+fun RootedTopology.checkInvariant(): Boolean {
+    val edgeList = edges
+    if (edgeList.size != topology.edges.size)
+        error("Edges number must be equal")
+
+    topology.checkInvariant()
+    topology.checkInvariant(edgeList)
+
+    recombinationGroups.forEach { group ->
+        group.elements.forEach { recombination ->
+            if (checkNode(recombination.firstParent, edgeList)) {
+                error("Can't find containing edge for parent1 ${recombination.firstParent}")
+            }
+            if (checkNode(recombination.secondParent, edgeList)) {
+                error("Can't find containing edge for parent2 ${recombination.secondParent}")
+            }
+            if (checkNode(recombination.child, edgeList)) {
+                error("Can't find containing edge for child ${recombination.child}")
+            }
+        }
+    }
+    return true
+}
+
+data class SplitResult(
+        val node: TopologyNode,
+        val inEdge: Edge,
+        val revInEdge: Edge,
+        val outEdge: Edge,
+        val revOutEdge: Edge
+)
+
+fun Edge.split(node: Node): SplitResult {
+    start.remove(this)
+    val startNode = start
+    end.removeIf { it.end === startNode }
+
+    val index = nodes.indexOf(node)
+    val newNode = TopologyNode(node)
+    val firstPart = Edge(start, newNode, nodes.subList(0, index + 1))
+    val secondPart = Edge(newNode, end, nodes.subList(index, nodes.size))
+
+    start.add(firstPart, directed = true)
+    newNode.add(secondPart, directed = true)
+
+    val reversedSecondPart = secondPart.reversed()
+    end.add(reversedSecondPart)
+    val reversedFirstPart = firstPart.reversed()
+    newNode.add(reversedFirstPart)
+
+    return SplitResult(newNode, firstPart, reversedFirstPart, secondPart, reversedSecondPart)
+}

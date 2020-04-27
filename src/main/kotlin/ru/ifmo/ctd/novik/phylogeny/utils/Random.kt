@@ -3,7 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 import kotlin.math.ln
 import kotlin.random.Random
 
-val GlobalRandom = Random(0)
+var GlobalRandom = Random(0)
 
 class LnPoissonProbabilityMassFunction(private val lambda: Double) {
     operator fun invoke(k: Int): Double = -lambda +

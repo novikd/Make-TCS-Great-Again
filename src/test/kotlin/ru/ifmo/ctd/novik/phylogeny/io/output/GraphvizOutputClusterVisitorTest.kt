@@ -23,7 +23,7 @@ internal class GraphvizOutputClusterVisitorTest {
         createEdge(node1, node3)
         createEdge(node2, node3)
 
-        val cluster = SimpleCluster(listOf(node1, node2, node3))
+        val cluster = SimpleCluster(mutableListOf(node1, node2, node3))
         val actual = GraphvizOutputClusterVisitor().visit(cluster)
         assertEquals(expected, actual)
     }
