@@ -43,7 +43,13 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         val secondParent = topology.getOrCreateNode(recombination.secondParent)
         val child = topology.getOrCreateNode(recombination.child)
 
-        removeExParents(topology, child)
+        if (!removeExParents(topology, child)) {
+            log.info { "Abort recombination application" }
+            rollbackSplit(topology, firstParent)
+            rollbackSplit(topology, secondParent)
+            rollbackSplit(topology, child)
+            return
+        }
 
         val firstDifference = computeDifference(child.genome, firstParent.genome)
         val secondDifference = computeDifference(child.genome, secondParent.genome)
@@ -78,6 +84,11 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         }
     }
 
+    private fun rollbackSplit(topology: RootedTopology, node: TopologyNode) {
+        if (node.edges.size == 2)
+            mergeTwoEdges(topology, node)
+    }
+
     private fun mergeTwoEdges(topology: RootedTopology, child: TopologyNode) {
         if (child.next.isEmpty())
             return
@@ -102,35 +113,64 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         topology.topology.add(Pair(newEdge, revNewEdge))
     }
 
-    private fun removeExParents(topology: RootedTopology, child: TopologyNode) {
+    private fun removeExParents(topology: RootedTopology, child: TopologyNode): Boolean {
         val childExParents = child.edges.filter { edge ->
             edge.end.next.any { it.end === child }
         }
         if (childExParents.size != 1)
-            return
+            return false
 
         val edgeToParent = childExParents.first()
+        val parent = edgeToParent.end
+        if (parent === topology.root)
+            return false
+
         child.remove(edgeToParent)
         topology.topology.remove(edgeToParent)
 
-        val parent = edgeToParent.end
         parent.removeIf { it.end === child }
 
         val nextNode = edgeToParent.nodes[1]
         child.node.neighbors.removeIf { it === nextNode }
         nextNode.neighbors.removeIf { it === child.node }
 
-        if (edgeToParent.length != 1) {
-            val newPath = edgeToParent.nodes.drop(1)
-            val newNode = TopologyNode(newPath[0])
-            val newEdge = Edge(newNode, parent, newPath)
-            val revNewEdge = newEdge.reversed()
+        var newTailNode: Node? = null
+        for (i in 1 until edgeToParent.nodes.lastIndex) {
+            val node = edgeToParent.nodes[i]
+            if (node.isRealTaxon) {
+                newTailNode = node
+                break
+            }
 
-            newNode.add(newEdge)
-            parent.add(revNewEdge, directed = true)
-            topology.topology.add(Pair(newEdge, revNewEdge))
-            topology.topology.nodes.add(newNode)
+            for (group in topology.recombinationGroups) {
+                group.elements.removeIf {
+                    it.firstParent === node || it.secondParent === node || it.child === node
+                }
+                if (group.elements.isEmpty())
+                    topology.recombinationGroups.remove(group)
+            }
+            node.neighbors.forEach { it.neighbors.remove(node) }
+            topology.topology.cluster.nodes.remove(node)
         }
+
+        if (newTailNode != null) {
+            val topologyNode = TopologyNode(newTailNode)
+            topology.topology.nodes.add(topologyNode)
+
+            val index = edgeToParent.nodes.indexOf(newTailNode)
+            val newPath = edgeToParent.nodes.subList(index, edgeToParent.nodes.size)
+            val newEdge = Edge(topologyNode, edgeToParent.end, newPath)
+            val revNewEdge = newEdge.reversed()
+            topology.topology.add(Pair(newEdge, revNewEdge))
+
+            topologyNode.add(newEdge)
+            parent.add(revNewEdge, directed = true)
+        } else {
+            if (parent.edges.size == 2) {
+                mergeTwoEdges(topology, parent)
+            }
+        }
+        return true
     }
 
     private fun createAncestor(topology: RootedTopology, commonDifference: Set<Pair<Int, Char>>, child: TopologyNode): TopologyNode {
