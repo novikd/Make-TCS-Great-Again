@@ -6,10 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.mcmc.MCMC
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.BranchLikelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.RecombinationLikelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.times
-import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.ChangeRootModification
-import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.HotspotMoveModification
-import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.Modification
-import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.NNIModification
+import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.*
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
@@ -27,7 +24,12 @@ class MCMCModel(val hotspots: List<Int>) : IModel {
         baseTopology.cluster.label()
         val length = phylogeny.cluster.terminals.first().genome.primary.length
         val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood(hotspots)
-        val modifications = listOf(ChangeRootModification(), NNIModification(), HotspotMoveModification(hotspots.toMutableList()))
+        val modifications = listOf(
+                ChangeRootModification(),
+                NNIModification(),
+                HotspotMoveModification(hotspots.toMutableList()),
+                CancelRecombinationModification()
+        )
         val mcmc = MCMC(likelihood, modifications)
         return mcmc.simulation(baseTopology.toRooted())
     }

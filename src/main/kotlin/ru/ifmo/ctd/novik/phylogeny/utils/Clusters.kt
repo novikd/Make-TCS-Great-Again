@@ -375,3 +375,28 @@ fun Edge.split(node: Node): SplitResult {
 
     return SplitResult(newNode, firstPart, reversedFirstPart, secondPart, reversedSecondPart)
 }
+
+fun RootedTopology.mergeTwoEdges(child: TopologyNode) {
+    if (child.next.isEmpty() || child.edges.size != 2)
+        return
+    val outEdge = child.next.first()
+    val inEdge = child.edges.first { it.end !== outEdge.end }
+
+    val start = inEdge.end
+    val end = outEdge.end
+
+    start.removeIf { it.end === child }
+    end.removeIf { it.end === child }
+    topology.nodes.remove(child)
+
+    topology.remove(inEdge)
+    topology.remove(outEdge)
+
+    val path = inEdge.nodes.reversed() + outEdge.nodes.drop(1)
+    val newEdge = Edge(start, end, path)
+    start.add(newEdge, directed = true)
+    val revNewEdge = newEdge.reversed()
+    end.add(revNewEdge)
+    topology.add(Pair(newEdge, revNewEdge))
+}
+

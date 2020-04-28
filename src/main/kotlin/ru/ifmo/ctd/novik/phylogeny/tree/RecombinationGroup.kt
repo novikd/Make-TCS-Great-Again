@@ -8,8 +8,16 @@ data class RecombinationGroup(
         val elements: MutableList<Recombination> = mutableListOf(),
         var isUsed: Boolean = false
 ) {
-    fun setUsed() {
+    var ambassador: RecombinationGroupAmbassador? = null
+
+    fun setUsed(ambassador: RecombinationGroupAmbassador) {
         isUsed = true
+        this.ambassador = ambassador
+    }
+
+    fun setUnused() {
+        isUsed = false
+        this.ambassador = null
     }
 
     fun add(recombination: Recombination) {

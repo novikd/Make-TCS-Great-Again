@@ -33,8 +33,6 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
     private fun applyRecombination(topology: RootedTopology, group: RecombinationGroup) {
         if (group.isUsed) return
-        group.setUsed()
-
         val recombination = group.elements.random(GlobalRandom)
 
         log.info { "Applying recombination at ${recombination.pos} site: $recombination" }
@@ -43,7 +41,8 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         val secondParent = topology.getOrCreateNode(recombination.secondParent)
         val child = topology.getOrCreateNode(recombination.child)
 
-        if (!removeExParents(topology, child)) {
+        val deletedPath = mutableListOf<Node>()
+        if (!removeExParents(topology, child, deletedPath)) {
             log.info { "Abort recombination application" }
             rollbackSplit(topology, firstParent)
             rollbackSplit(topology, secondParent)
@@ -79,41 +78,25 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
         if (child !== topologyNode) {
             if (child.edges.size == 2) {
-                mergeTwoEdges(topology, child)
+                topology.mergeTwoEdges(child)
             }
         }
+
+        debug {
+            val errorNode = topology.topology.cluster.find { node -> !topology.edges.any { it.contains(node) } }
+            if (errorNode != null)
+                error("Node $errorNode removal was incorrect")
+        }
+
+        group.setUsed(RecombinationGroupAmbassador(recombination, topologyNode, deletedPath))
     }
 
     private fun rollbackSplit(topology: RootedTopology, node: TopologyNode) {
         if (node.edges.size == 2)
-            mergeTwoEdges(topology, node)
+            topology.mergeTwoEdges(node)
     }
 
-    private fun mergeTwoEdges(topology: RootedTopology, child: TopologyNode) {
-        if (child.next.isEmpty())
-            return
-        val outEdge = child.next.first()
-        val inEdge = child.edges.first { it.end !== outEdge.end }
-
-        val start = inEdge.end
-        val end = outEdge.end
-
-        start.removeIf { it.end === child }
-        end.removeIf { it.end === child }
-        topology.topology.nodes.remove(child)
-
-        topology.topology.remove(inEdge)
-        topology.topology.remove(outEdge)
-
-        val path = inEdge.nodes.reversed() + outEdge.nodes.drop(1)
-        val newEdge = Edge(start, end, path)
-        start.add(newEdge, directed = true)
-        val revNewEdge = newEdge.reversed()
-        end.add(revNewEdge)
-        topology.topology.add(Pair(newEdge, revNewEdge))
-    }
-
-    private fun removeExParents(topology: RootedTopology, child: TopologyNode): Boolean {
+    private fun removeExParents(topology: RootedTopology, child: TopologyNode, deletedPath: MutableList<Node>): Boolean {
         val childExParents = child.edges.filter { edge ->
             edge.end.next.any { it.end === child }
         }
@@ -134,21 +117,26 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         child.node.neighbors.removeIf { it === nextNode }
         nextNode.neighbors.removeIf { it === child.node }
 
+        deletedPath.add(child.node)
         var newTailNode: Node? = null
         for (i in 1 until edgeToParent.nodes.lastIndex) {
             val node = edgeToParent.nodes[i]
+            deletedPath.add(node)
             if (node.isRealTaxon) {
                 newTailNode = node
                 break
+            }
+
+            debug {
+                log.info { "Deleting node: ${node.nodeName}" }
             }
 
             for (group in topology.recombinationGroups) {
                 group.elements.removeIf {
                     it.firstParent === node || it.secondParent === node || it.child === node
                 }
-                if (group.elements.isEmpty())
-                    topology.recombinationGroups.remove(group)
             }
+            topology.recombinationGroups.removeIf { group -> group.elements.isEmpty() }
             node.neighbors.forEach { it.neighbors.remove(node) }
             topology.topology.cluster.nodes.remove(node)
         }
@@ -166,9 +154,8 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
             topologyNode.add(newEdge)
             parent.add(revNewEdge, directed = true)
         } else {
-            if (parent.edges.size == 2) {
-                mergeTwoEdges(topology, parent)
-            }
+            deletedPath.add(parent.node)
+            topology.mergeTwoEdges(parent)
         }
         return true
     }

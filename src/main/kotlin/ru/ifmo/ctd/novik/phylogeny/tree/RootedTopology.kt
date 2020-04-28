@@ -1,9 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.tree
 
-import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
-import ru.ifmo.ctd.novik.phylogeny.utils.genome
-import ru.ifmo.ctd.novik.phylogeny.utils.logger
-import ru.ifmo.ctd.novik.phylogeny.utils.split
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 data class RootedTopology(
         val topology: Topology,
@@ -49,13 +46,34 @@ data class RootedTopology(
             val newGroup = group.copy(elements = newElements)
             if (group.isUsed != newGroup.isUsed)
                 error("Group usage info lost")
+            if (group.isUsed) {
+                val (recombination, midNode, deletedPath) = group.ambassador!!
+                val newDeletedPath = mutableListOf(generation[deletedPath.first()]!!)
+                for (i in 1 until deletedPath.lastIndex) {
+                    newDeletedPath.add(deletedPath[i])
+                }
+                newDeletedPath.add(generation[deletedPath.last()]!!)
+
+                newGroup.ambassador = RecombinationGroupAmbassador(
+                        Recombination(
+                                generation[recombination.firstParent]!!,
+                                generation[recombination.secondParent]!!,
+                                generation[recombination.child]!!,
+                                recombination.pos),
+                        topGeneration[midNode]!!,
+                        newDeletedPath
+                )
+            }
+
             newRecombinationGroups.add(newGroup)
         }
 
         val newRootedTopology = RootedTopology(newTopology, newRoot, newRecombinationGroups)
-        if (edges.size != newRootedTopology.edges.size)
-            error("Edges number must be equal")
-        newRootedTopology.checkInvariant()
+        debug {
+            if (edges.size != newRootedTopology.edges.size)
+                error("Edges number must be equal")
+            newRootedTopology.checkInvariant()
+        }
         return newRootedTopology
     }
 

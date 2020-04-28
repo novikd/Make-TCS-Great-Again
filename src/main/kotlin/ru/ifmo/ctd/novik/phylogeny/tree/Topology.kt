@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.tree
 import ru.ifmo.ctd.novik.phylogeny.common.ClusterCloneResult
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
+import ru.ifmo.ctd.novik.phylogeny.utils.debug
 
 /**
  * @author Dmitry Novik ITMO University
@@ -36,13 +37,15 @@ data class Topology(
             newEdges.add(Pair(newFst, newSnd))
         }
 
-        val invariant = topGeneration.all { (old, new) -> old.edges.size == new.edges.size } && edges.size == newEdges.size
-        if (!invariant)
-            error("Topology clone error")
-
         val topology = Topology(newCluster, newNodes, newEdges)
-        this.checkInvariant()
-        topology.checkInvariant()
+        debug {
+            val invariant = topGeneration.all { (old, new) -> old.edges.size == new.edges.size } && edges.size == newEdges.size
+            if (!invariant)
+                error("Topology clone error")
+
+            this.checkInvariant()
+            topology.checkInvariant()
+        }
 
         return TopologyCloneResult(topology, generation, topGeneration)
     }
