@@ -5,7 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
-private const val HOTSPOT_DISTANCE_THRESHOLD = 0.1
+private const val HOTSPOT_DISTANCE_THRESHOLD = 0.05
 
 class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
@@ -41,8 +41,9 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         val secondParent = topology.getOrCreateNode(recombination.secondParent)
         val child = topology.getOrCreateNode(recombination.child)
 
+        val createdEdges = mutableListOf<Edge>()
         val deletedPath = mutableListOf<Node>()
-        if (!removeExParents(topology, child, deletedPath)) {
+        if (!removeExParents(topology, child, createdEdges, deletedPath)) {
             log.info { "Abort recombination application" }
             rollbackSplit(topology, firstParent)
             rollbackSplit(topology, secondParent)
@@ -64,6 +65,9 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         firstParent.add(fromFirstParent, directed = true)
         val fromSecondParent = Edge.create(secondParent, topologyNode)
         secondParent.add(fromSecondParent, directed = true)
+
+        createdEdges.add(fromFirstParent)
+        createdEdges.add(fromSecondParent)
 
         createEdge(firstParent.node, topologyNode.node)
         createEdge(secondParent.node, topologyNode.node)
@@ -88,7 +92,7 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
                 error("Node $errorNode removal was incorrect")
         }
 
-        group.setUsed(RecombinationGroupAmbassador(recombination, topologyNode, deletedPath))
+        group.setUsed(RecombinationGroupAmbassador(recombination, topologyNode, createdEdges, deletedPath))
     }
 
     private fun rollbackSplit(topology: RootedTopology, node: TopologyNode) {
@@ -96,7 +100,12 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
             topology.mergeTwoEdges(node)
     }
 
-    private fun removeExParents(topology: RootedTopology, child: TopologyNode, deletedPath: MutableList<Node>): Boolean {
+    private fun removeExParents(
+            topology: RootedTopology,
+            child: TopologyNode,
+            createdEdges: MutableList<Edge>,
+            deletedPath: MutableList<Node>
+    ): Boolean {
         val childExParents = child.edges.filter { edge ->
             edge.end.next.any { it.end === child }
         }
@@ -153,6 +162,7 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
             topologyNode.add(newEdge)
             parent.add(revNewEdge, directed = true)
+            createdEdges.add(newEdge)
         } else {
             deletedPath.add(parent.node)
             topology.mergeTwoEdges(parent)

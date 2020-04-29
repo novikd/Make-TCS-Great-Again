@@ -6,6 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.Modification
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
 import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
+import ru.ifmo.ctd.novik.phylogeny.utils.debug
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
 import kotlin.random.Random
 
@@ -32,10 +33,14 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
             val newLikelihood = likelihood(newTopology)
 
             if (newLikelihood > currentLikelihood || GlobalRandom.nextDouble() > 0.5) {
-                log.info { "Accepted $modification" }
+                log.info {
+                    "Accepted $modification\nPrevious likelihood: $currentLikelihood\nNew likelihood: $newLikelihood"
+                }
                 currentTopology = newTopology
                 currentLikelihood = newLikelihood
-                HotspotMoveModification.log.info { "Invariant after modification: ${currentTopology.checkInvariant()}" }
+                debug {
+                    log.info { "Invariant after modification: ${currentTopology.checkInvariant()}" }
+                }
             }
 
             if (iter % 100 == 0) {

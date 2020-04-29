@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.common
 
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.utils.genome
 
 /**
  * @author Novik Dmitry ITMO University
@@ -8,6 +9,9 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
 class SimpleCluster(override val nodes: MutableList<Node>) : Cluster {
     override val terminals: List<Node>
         get() = nodes.filter(Node::isRealTaxon)
+
+    override val genomeNumber: Int
+        get() = nodes.map { it.genome.size }.sum()
 
     constructor(taxon: Taxon) : this(mutableListOf(Node(taxon)))
 

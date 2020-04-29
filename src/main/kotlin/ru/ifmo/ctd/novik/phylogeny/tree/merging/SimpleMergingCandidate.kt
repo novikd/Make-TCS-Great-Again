@@ -11,6 +11,7 @@ import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
 import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingBridge
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
+import ru.ifmo.ctd.novik.phylogeny.utils.logger
 
 /**
  * @author Dmitry Novik ITMO University
@@ -24,6 +25,10 @@ open class SimpleMergingCandidate(
 
     override val mergeMetric: MergeMetric by lazy { TCSMergeMetric(distance.value, taxonDistanceEvaluator) }
 
+    companion object {
+        val log = logger()
+    }
+
     override fun merge(): MergingResult {
         val pairs = distance.minimumPoints
 
@@ -31,6 +36,8 @@ open class SimpleMergingCandidate(
 
         val firstPossiblePaths = first.pathsToAdjacentRealTaxon
         val secondPossiblePaths = second.pathsToAdjacentRealTaxon
+
+        log.info { "First paths: ${firstPossiblePaths.map { it.size }} Second paths: ${secondPossiblePaths.map { it.size }}" }
 
         var bridge: IMergingBridge = emptyMergingBridge()
         for (firstPath in firstPossiblePaths) {

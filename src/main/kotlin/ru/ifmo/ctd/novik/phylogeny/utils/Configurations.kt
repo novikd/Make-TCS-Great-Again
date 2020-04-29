@@ -34,7 +34,7 @@ fun PhylogeneticModel.create(hotspots: List<Int> = listOf()): IModel {
     return when (this) {
         PhylogeneticModel.BASE_TCS -> TCSModel(RealClusterDistanceEvaluator(PrimaryTaxonDistanceEvaluator().toCaching()))
         PhylogeneticModel.BRUTE_FORCE_TCS -> BruteForceTCSModel(RealClusterDistanceEvaluator(PrimaryTaxonDistanceEvaluator()))
-        PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(AbsoluteClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator().toCaching()))
+        PhylogeneticModel.SET_BRUTE_FORCE_TCS -> SetBruteForceTCSModel(AbsoluteClusterDistanceEvaluator(AbsoluteTaxonDistanceEvaluator()).toCaching())
         PhylogeneticModel.MCMC -> MCMCModel(hotspots)
     }
 }

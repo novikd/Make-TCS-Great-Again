@@ -4,6 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.IGenome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.utils.Path
 import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
+import ru.ifmo.ctd.novik.phylogeny.utils.genome
 
 /**
  * @author Novik Dmitry ITMO University
@@ -28,7 +29,7 @@ data class Node(val taxon: Taxon) {
         get() {
             fun dfs(node: Node, prev: Node? = null): MutableList<Path> {
                 val result = mutableListOf<Path>()
-                if (prev != null && node.isRealTaxon) {
+                if (prev != null && node.genome.size == 1) {
                     result.add(mutableListOf())
                     return result
                 }

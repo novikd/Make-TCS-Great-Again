@@ -47,12 +47,16 @@ data class RootedTopology(
             if (group.isUsed != newGroup.isUsed)
                 error("Group usage info lost")
             if (group.isUsed) {
-                val (recombination, midNode, deletedPath) = group.ambassador!!
+                val (recombination, midNode, createdEdges, deletedPath) = group.ambassador!!
                 val newDeletedPath = mutableListOf(generation[deletedPath.first()]!!)
                 for (i in 1 until deletedPath.lastIndex) {
                     newDeletedPath.add(deletedPath[i])
                 }
                 newDeletedPath.add(generation[deletedPath.last()]!!)
+
+                val newCreatedEdges = createdEdges.map { edge ->
+                    topGeneration[edge.start]!!.next.first { it.end === topGeneration[edge.end]!! }
+                }
 
                 newGroup.ambassador = RecombinationGroupAmbassador(
                         Recombination(
@@ -61,6 +65,7 @@ data class RootedTopology(
                                 generation[recombination.child]!!,
                                 recombination.pos),
                         topGeneration[midNode]!!,
+                        newCreatedEdges,
                         newDeletedPath
                 )
             }

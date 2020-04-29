@@ -46,6 +46,13 @@ abstract class AbstractDistanceBasedModel : IModel {
             clusters.remove(currentCandidate.secondCluster)
             clusters.add(newCluster)
             branches.add(branch)
+
+            log.info {
+                "Current total number of genomes: ${clusters.map { it.genomeNumber }.sum()}\nSeparate sizes: ${clusters.map { it.genomeNumber }.joinToString(separator = " ")}"
+            }
+            log.info {
+                "Current nodes number: ${clusters.map { it.nodes.size }.joinToString(separator = " ")}"
+            }
         }
         return Phylogeny(clusters.first(), branches)
     }

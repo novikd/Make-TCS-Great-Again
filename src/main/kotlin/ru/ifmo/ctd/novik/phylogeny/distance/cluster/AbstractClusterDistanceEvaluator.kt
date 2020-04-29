@@ -11,7 +11,7 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Node
  */
 abstract class AbstractClusterDistanceEvaluator(
         override val taxonDistanceEvaluator: TaxonDistanceEvaluator
-) : ClusterDistanceEvaluator, TaxonDistanceEvaluator by taxonDistanceEvaluator {
+) : ClusterDistanceEvaluator {
 
     protected abstract fun filteredCluster(cluster: Cluster): Iterable<Node>
 
@@ -20,7 +20,7 @@ abstract class AbstractClusterDistanceEvaluator(
         val distanceMinima = mutableListOf<DistanceMinimumPoint>()
         for (left in filteredCluster(lhs)) {
             for (right in filteredCluster(rhs)) {
-                val distance = evaluate(left.taxon, right.taxon)
+                val distance = taxonDistanceEvaluator.evaluate(left.taxon, right.taxon)
                 if (distance.value < result) {
                     distanceMinima.clear()
                     distanceMinima.add(DistanceMinimumPoint(left, right, distance))

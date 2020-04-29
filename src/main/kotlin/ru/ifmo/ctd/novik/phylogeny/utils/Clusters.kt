@@ -291,28 +291,28 @@ val Node.genome: IGenome
 val TopologyNode.genome: IGenome
     get() = node.genome
 
-inline fun Node.computeAllGraphDistances(predicate: (Node.() -> Boolean) = { true }): Map<Node, Int> {
+fun Node.computeGraphDistances(): Map<Node, Int> {
     val result = hashMapOf<Node, Int>()
     result[this] = 0
 
-    val queue: Queue<Node> = ArrayDeque()
-    queue.add(this)
+    val queue = ArrayDeque<Pair<Node, Int>>()
+    queue.add(Pair(this, 0))
+    val visited = mutableSetOf<Node>(this)
 
     while (queue.isNotEmpty()) {
-        val currentNode = queue.poll()
-        val currentDistance = result[currentNode]!!
+        val (currentNode, currentDistance) = queue.pop()
         for (neighbor in currentNode.neighbors) {
-            if (!result.contains(neighbor) && predicate(neighbor)) {
-                result[neighbor] = currentDistance + 1
-                queue.add(neighbor)
+            if (neighbor !in visited) {
+                visited.add(neighbor)
+                val newDistance = currentDistance + 1
+                if (neighbor.isRealTaxon)
+                    result[neighbor] = newDistance
+                queue.add(Pair(neighbor, newDistance))
             }
         }
     }
-
     return result
 }
-
-fun Node.computeGraphDistances(): Map<Node, Int> = this.computeAllGraphDistances().filterKeys { x -> x.isRealTaxon }
 
 fun checkNode(node: Node, edges: List<Edge>): Boolean = !edges.any { edge -> edge.contains(node) }
 

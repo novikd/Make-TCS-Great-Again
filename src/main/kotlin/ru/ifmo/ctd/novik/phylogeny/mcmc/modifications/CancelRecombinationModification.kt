@@ -18,7 +18,7 @@ class CancelRecombinationModification : Modification {
         if (usedGroups.isEmpty()) return topology
 
         val group = usedGroups.random(GlobalRandom)
-        val (recombination, midNode, path) = group.ambassador!!
+        val (recombination, midNode, _, path) = group.ambassador!!
 
         log.info { "Canceling recombination: $recombination" }
 

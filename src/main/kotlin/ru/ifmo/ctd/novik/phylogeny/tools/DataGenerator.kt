@@ -12,7 +12,7 @@ fun read2Int(): Pair<Int, Int> {
     return Pair(x, y)
 }
 
-fun mutate(parent: String): String {
+private fun mutate(parent: String): String {
     val random = Random.Default
     val mutationNumber = random.nextInt(parent.length / 4).absoluteValue
 
