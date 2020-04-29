@@ -7,6 +7,6 @@ object SubstitutionModel {
             'C' to mapOf('A' to 1.0 / 6, 'G' to 1.0 / 6, 'T' to 1.0 / 6),
             'G' to mapOf('C' to 1.0 / 6, 'A' to 1.0 / 6, 'T' to 1.0 / 6),
             'T' to mapOf('C' to 1.0 / 6, 'G' to 1.0 / 6, 'A' to 1.0 / 6))
-    var mutationRate: Double = 1.0
+    var mutationRate: Double = 1e-1
     var recombinationRate: Double = 1.0
 }

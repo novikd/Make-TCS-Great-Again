@@ -42,7 +42,7 @@ fun main() {
 
             val hotspot = hotspots.random(LOCAL_RANDOM)
 
-            println("Recombination at $hotspot site")
+            println("Recombination at $hotspot site: seq$firstParent and seq$secondParent")
 
             println("Prefix hamming: ${hammingDistance(currentLeafs[firstParent].substring(0, hotspot), currentLeafs[secondParent].substring(0, hotspot))}")
             println("Suffix hamming: ${hammingDistance(currentLeafs[firstParent].substring(hotspot), currentLeafs[secondParent].substring(hotspot))}")

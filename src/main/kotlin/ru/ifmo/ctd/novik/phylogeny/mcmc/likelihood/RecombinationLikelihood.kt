@@ -16,7 +16,7 @@ class RecombinationLikelihood(lambda: Double) : Likelihood {
     override fun invoke(topology: RootedTopology): Double {
         val usedHotspots = topology.recombinationGroups.filter { it.isUsed }.map { it.hotspot }.toSet().size
         val result = poisson(usedHotspots)
-        debug { log.info { "Recombination likelihood: $result" } }
+        debug { log.info { "Recombination likelihood: $result with $usedHotspots" } }
         return result
     }
 }

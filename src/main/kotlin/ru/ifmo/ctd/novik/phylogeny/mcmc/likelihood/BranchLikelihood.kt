@@ -29,6 +29,7 @@ class BranchLikelihood(lambda: Double) : Likelihood {
             result += a.genome.primary.zip(b.genome.primary).filter { (lhs, rhs) ->
                 lhs != rhs
             }.map { ln(SubstitutionModel.nucleotideProbability[it.second]!!) }.fold(0.0, Double::plus)
+//            }.map { ln(SubstitutionModel.relativeSubstitutionProbability[it.first]!![it.second]!!) }.fold(0.0, Double::plus)
         }
         return result
     }

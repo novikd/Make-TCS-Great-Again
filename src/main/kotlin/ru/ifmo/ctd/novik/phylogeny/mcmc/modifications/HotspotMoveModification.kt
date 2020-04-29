@@ -5,7 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
-private const val HOTSPOT_DISTANCE_THRESHOLD = 0.05
+private const val HOTSPOT_DISTANCE_THRESHOLD = 0.03
 
 class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
@@ -14,8 +14,7 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
     }
 
     override fun invoke(topology: RootedTopology): RootedTopology {
-        val hotspotPosition = (0 until hotspots.size).random(GlobalRandom)
-        val hotspot = hotspots[hotspotPosition]
+        val hotspot = hotspots.random(GlobalRandom)
 
         log.info { "Looking for recombination at $hotspot site" }
 
@@ -43,7 +42,8 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
         val createdEdges = mutableListOf<Edge>()
         val deletedPath = mutableListOf<Node>()
-        if (!removeExParents(topology, child, createdEdges, deletedPath)) {
+        if (!isConsistentRecombination(child, firstParent, secondParent)
+                || !removeExParents(topology, child, createdEdges, deletedPath)) {
             log.info { "Abort recombination application" }
             rollbackSplit(topology, firstParent)
             rollbackSplit(topology, secondParent)
@@ -90,10 +90,14 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
             val errorNode = topology.topology.cluster.find { node -> !topology.edges.any { it.contains(node) } }
             if (errorNode != null)
                 error("Node $errorNode removal was incorrect")
+            topology.checkInvariant()
         }
 
         group.setUsed(RecombinationGroupAmbassador(recombination, topologyNode, createdEdges, deletedPath))
     }
+
+    private fun isConsistentRecombination(child: TopologyNode, firstParent: TopologyNode, secondParent: TopologyNode) =
+            child.next.all { it.end !== firstParent && it.end !== secondParent }
 
     private fun rollbackSplit(topology: RootedTopology, node: TopologyNode) {
         if (node.edges.size == 2)
