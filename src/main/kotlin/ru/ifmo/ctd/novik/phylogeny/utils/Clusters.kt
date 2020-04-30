@@ -293,7 +293,8 @@ val TopologyNode.genome: IGenome
 
 fun Node.computeGraphDistances(): Map<Node, Int> {
     val result = hashMapOf<Node, Int>()
-    result[this] = 0
+    if (isRealTaxon)
+        result[this] = 0
 
     val queue = ArrayDeque<Pair<Node, Int>>()
     queue.add(Pair(this, 0))

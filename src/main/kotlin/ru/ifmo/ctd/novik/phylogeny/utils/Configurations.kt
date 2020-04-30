@@ -14,7 +14,7 @@ import ru.ifmo.ctd.novik.phylogeny.models.*
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import java.util.logging.Logger
 
-var DEBUG_ENABLED = false
+var DEBUG_ENABLED = true
 
 inline fun debug(action: () -> Unit) {
     if (DEBUG_ENABLED)
@@ -47,8 +47,6 @@ object ModelChoice : ArgType<PhylogeneticModel>(true) {
         get() = { value, _ -> PhylogeneticModel.values().find { model -> model.shortName == value } ?: PhylogeneticModel.BASE_TCS }
 }
 
-fun String.readSimpleData(): List<Taxon> = SimpleInputTaxaReader().readFile(this)
-
 fun IModel.evaluateSimpleData(dataFile: String): Phylogeny {
     val reader = SimpleInputTaxaReader()
     val taxonList = reader.readFile(dataFile)
@@ -56,13 +54,6 @@ fun IModel.evaluateSimpleData(dataFile: String): Phylogeny {
     val phylogeny = this.computePhylogeny(taxonList)
     phylogeny.unify()
     return phylogeny
-}
-
-fun IModel.computeForFastaData(dataFile: String): RootedTopology {
-    val reader = FastaInputTaxaReader()
-    val taxonList = reader.readFile(dataFile).distinctBy { it.genome.primary }
-
-    return this.computeTopology(taxonList)
 }
 
 inline fun <reified R : Any> R.logger(): Logger =
