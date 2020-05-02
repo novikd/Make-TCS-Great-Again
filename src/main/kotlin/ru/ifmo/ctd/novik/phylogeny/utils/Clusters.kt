@@ -277,7 +277,7 @@ fun Topology.toRooted(root: TopologyNode = nodes.random(GlobalRandom)): RootedTo
     return RootedTopology(this, root)
 }
 
-typealias Path = MutableList<Node>
+typealias Path = List<Node>
 
 fun createEdge(v: Node, u: Node, directed: Boolean = false) {
     v.connect(u)

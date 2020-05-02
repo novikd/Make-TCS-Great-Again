@@ -8,10 +8,7 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Branch
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.TCSMergeMetric
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
-import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingBridge
-import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.utils.logger
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 /**
  * @author Dmitry Novik ITMO University
@@ -34,29 +31,25 @@ open class SimpleMergingCandidate(
 
         val (first, second) = pairs.random(GlobalRandom)
 
-        val firstPossiblePaths = first.pathsToAdjacentRealTaxon
-        val secondPossiblePaths = second.pathsToAdjacentRealTaxon
+        val firstNodes = first.adjacentIntermediateNodes
+        val secondNodes = second.adjacentIntermediateNodes
 
-        log.info { "First paths: ${firstPossiblePaths.map { it.size }} Second paths: ${secondPossiblePaths.map { it.size }}" }
+        log.info { "First nodes: ${firstNodes.size} Second nodes: ${secondNodes.size}" }
 
         var bridge: IMergingBridge = emptyMergingBridge()
-        for (firstPath in firstPossiblePaths) {
-            for (secondPath in secondPossiblePaths) {
-                for ((i, firstNode) in firstPath.withIndex()) {
-                    for ((j, secondNode) in secondPath.withIndex()) {
-                        val bridgeLength = distance.value - i - j
-                        if (bridgeLength < 1)
-                            continue
 
-                        val metaData = MergingMetaData(firstPath.subList(0, i + 1), secondPath.subList(0, j + 1),
-                                bridgeLength)
-                        val metric = mergeMetric.compute(firstNode, secondNode, metaData)
-                        if (metric == Int.MIN_VALUE)
-                            continue
-                        if (metric > bridge.metric) {
-                            bridge = MergingBridge(firstNode, secondNode, bridgeLength, metric)
-                        }
-                    }
+        for ((firstNode, i) in firstNodes) {
+            for ((secondNode, j) in secondNodes) {
+                val bridgeLength = distance.value - i - j
+                if (bridgeLength < 1)
+                    continue
+
+                val metaData = MergingMetaData(listOf(firstNode), listOf(secondNode), bridgeLength)
+                val metric = mergeMetric.compute(firstNode, secondNode, metaData)
+                if (metric == Int.MIN_VALUE)
+                    continue
+                if (metric > bridge.metric) {
+                    bridge = MergingBridge(firstNode, secondNode, bridgeLength, metric)
                 }
             }
         }

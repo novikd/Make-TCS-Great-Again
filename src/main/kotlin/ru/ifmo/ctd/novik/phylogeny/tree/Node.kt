@@ -1,10 +1,9 @@
 package ru.ifmo.ctd.novik.phylogeny.tree
 
-import ru.ifmo.ctd.novik.phylogeny.common.IGenome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
-import ru.ifmo.ctd.novik.phylogeny.utils.Path
 import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
 import ru.ifmo.ctd.novik.phylogeny.utils.genome
+import java.util.*
 
 /**
  * @author Novik Dmitry ITMO University
@@ -25,10 +24,20 @@ data class Node(val taxon: Taxon) {
         neighbors.add(node)
     }
 
-    val pathsToAdjacentRealTaxon: List<Path>
+    val adjacentIntermediateNodes: Map<Node, Int>
         get() {
-            fun dfs(node: Node, prev: Node? = null): MutableList<Path> {
-                val result = mutableListOf<Path>()
+            val result = mutableMapOf(this to 0)
+
+            bfs({ it !in result && it.genome.size != 1 }) {
+                prev, node -> result[node] = result[prev]!! + 1
+            }
+            return result
+        }
+
+    val pathsToAdjacentRealTaxon: List<MutableList<Node>>
+        get() {
+            fun dfs(node: Node, prev: Node? = null): MutableList<MutableList<Node>> {
+                val result = mutableListOf<MutableList<Node>>()
                 if (prev != null && node.genome.size == 1) {
                     result.add(mutableListOf())
                     return result
@@ -56,3 +65,17 @@ data class Node(val taxon: Taxon) {
     }
 }
 
+inline fun Node.bfs(shouldVisit: (Node) -> Boolean, action: (Node, Node) -> Unit) {
+    val queue = ArrayDeque<Node>()
+    queue.add(this)
+
+    while (queue.isNotEmpty()) {
+        val node = queue.pop()
+        node.neighbors.forEach { neighbor ->
+            if (shouldVisit(neighbor)) {
+                action(node, neighbor)
+                queue.add(neighbor)
+            }
+        }
+    }
+}
