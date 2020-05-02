@@ -4,10 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingMetaData
-import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPositions
-import ru.ifmo.ctd.novik.phylogeny.utils.computeGraphDistances
-import ru.ifmo.ctd.novik.phylogeny.utils.permutations
-import ru.ifmo.ctd.novik.phylogeny.utils.toMutableGenome
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEvaluator) : MergeMetric {
 
@@ -16,6 +13,8 @@ open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEva
     }
 
     override fun compute(firstNode: Node, secondNode: Node, metaData: MergingMetaData): Int {
+        if (firstNode.genome.isEmpty || secondNode.genome.isEmpty)
+            return Int.MIN_VALUE
         val positions = computeDistinctPositions(metaData.firstRealTaxon, metaData.secondRealTaxon)
 
         val firstDistances = firstNode.computeGraphDistances()
