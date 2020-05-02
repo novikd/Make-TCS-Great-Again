@@ -14,10 +14,6 @@ data class Node(val taxon: Taxon) {
     val neighbors: MutableList<Node> = mutableListOf()
     val next: MutableList<Node> = mutableListOf()
 
-    val parent: Node? by lazy {
-        neighbors.find { node -> node.next.contains(this) }
-    }
-
     constructor() : this(createTaxon())
 
     fun connect(node: Node) {
