@@ -34,32 +34,6 @@ data class Node(val taxon: Taxon) {
             return result
         }
 
-    val pathsToAdjacentRealTaxon: List<MutableList<Node>>
-        get() {
-            fun dfs(node: Node, prev: Node? = null): MutableList<MutableList<Node>> {
-                val result = mutableListOf<MutableList<Node>>()
-                if (prev != null && node.genome.size == 1) {
-                    result.add(mutableListOf())
-                    return result
-                }
-
-                for (neighbor in node.neighbors) {
-                    if (neighbor == prev)
-                        continue
-                    result.addAll(dfs(neighbor, node))
-                }
-
-                result.forEach { x -> x.add(node) }
-                return result
-            }
-
-            val result = dfs(this)
-            if (result.isEmpty())
-                result.add(mutableListOf(this))
-            result.forEach { it.reverse() }
-            return result
-        }
-
     override fun toString(): String {
         return nodeName
     }
