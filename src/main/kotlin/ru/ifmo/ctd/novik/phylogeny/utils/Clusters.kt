@@ -378,7 +378,7 @@ fun Edge.split(node: Node): SplitResult {
 }
 
 fun RootedTopology.mergeTwoEdges(child: TopologyNode) {
-    if (child.next.isEmpty() || child.edges.size != 2)
+    if (child.edges.size != 2 || child.next.size != 1)
         return
     val outEdge = child.next.first()
     val inEdge = child.edges.first { it.end !== outEdge.end }
