@@ -1,39 +1,21 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.tree.TopologyNode
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
-import java.util.*
+import ru.ifmo.ctd.novik.phylogeny.utils.mergeTwoEdges
 
 class ChangeRootModification : Modification {
     override fun invoke(topology: RootedTopology): RootedTopology {
-        val newTopolgy = topology.clone()
-        val newRoot = newTopolgy.topology.nodes.random(GlobalRandom)
+        val recombinationEdges = topology.recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges }.toSet()
 
-//
-//        val newTopology = topology.topology.toRooted(newRoot)
-//        newTopology.recombinationGroups.addAll(topology.recombinationGroups)
-//
-//        return newTopology
-        return topology
-    }
+        val oldRoot = topology.root
+        val edgeWithNewRoot = oldRoot.edges.filter { it !in recombinationEdges }.random()
+        val newRoot = topology.getOrCreateNode(edgeWithNewRoot.nodes[1])
 
-    private fun traverse(root: TopologyNode) {
-        val visited: MutableSet<TopologyNode> = mutableSetOf()
-        val queue = ArrayDeque<TopologyNode>()
-        queue.add(root)
-        visited.add(root)
+        val edgeBetweenRoots = newRoot.edges.first { it.end === oldRoot }
+        newRoot.next.add(edgeBetweenRoots)
+        oldRoot.next.removeIf { it.end === newRoot }
+        topology.mergeTwoEdges(oldRoot)
 
-        while (queue.isNotEmpty()) {
-            val node = queue.pop()
-
-            node.edges.forEach { edge ->
-                if (edge.end !in visited) {
-                    visited.add(edge.end)
-                    queue.add(edge.end)
-                    
-                }
-            }
-        }
+        return topology.copy(root = newRoot)
     }
 }
