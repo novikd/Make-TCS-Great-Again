@@ -25,10 +25,10 @@ class MCMCModel(val hotspots: List<Int>) : IModel {
         val baseTopology = phylogeny.cluster.topology()
         baseTopology.cluster.label()
         val length = phylogeny.cluster.terminals.first().genome.primary.length
-        val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood(P_RECOMBINATION * RESULT_GENOMES_NUMBER)
+        val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood(P_RECOMBINATION * taxonList.size)
         val modifications = listOf(
                 ChangeRootModification(),
-                NNIModification(),
+//                NNIModification(),
                 HotspotMoveModification(hotspots.toMutableList()),
                 CancelRecombinationModification()
         )

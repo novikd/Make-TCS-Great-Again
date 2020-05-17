@@ -11,7 +11,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.genome
 /**
  * @author Novik Dmitry ITMO University
  */
-class GraphvizOutputClusterVisitor : OutputClusterVisitor {
+class GraphvizOutputClusterVisitor(private val printer: Printer) : OutputClusterVisitor {
 
     override fun visit(cluster: Cluster): String {
         val node = cluster.nodes.first()
@@ -75,7 +75,7 @@ class GraphvizOutputClusterVisitor : OutputClusterVisitor {
         return result
     }
 
-    private fun printNode(node: Node) = if (node.isRealTaxon) node.genome.toString() else "${node.nodeName}{${node.genome}}"
+    private fun printNode(node: Node) = printer.print(node)
 
     private fun printEdge(edge: Edge) = "\"NODE: ${printNode(edge.start.node)}\" -- \"NODE: ${printNode(edge.end.node)}\""
 

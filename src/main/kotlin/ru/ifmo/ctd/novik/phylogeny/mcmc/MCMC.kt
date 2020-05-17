@@ -24,7 +24,7 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
         var currentTopology = startTopology
         var currentLikelihood = likelihood(currentTopology)
 
-        log.info { "\n******* START MCMC SIMULATION *******\n" }
+        log.info { "\n******* START MCMC SIMULATION *******\nInitial likelihood: $currentLikelihood\n" }
 
         while (!shouldStop()) {
             ++iter

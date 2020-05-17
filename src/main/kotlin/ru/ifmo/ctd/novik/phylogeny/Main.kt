@@ -6,6 +6,7 @@ import kotlinx.cli.default
 import kotlinx.cli.required
 import ru.ifmo.ctd.novik.phylogeny.io.input.FastaInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.io.input.SimpleInputTaxaReader
+import ru.ifmo.ctd.novik.phylogeny.io.output.PrettyPrinter
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 import java.io.File
 
@@ -32,19 +33,27 @@ fun main(args: Array<String>) {
         "fas" -> FastaInputTaxaReader()
         else -> SimpleInputTaxaReader()
     }
-    val taxonList = reader.readFile(input).distinctBy { it.genome.primary }.take(25)
+    val taxonList = reader.readFile(input).distinctBy { it.genome.primary }
     println(taxonList.size)
 
     val startTime = System.currentTimeMillis()
     when (output) {
         "topology" -> {
             val topology = model.computeTopology(taxonList)
-            println(topology.toGraphviz())
+            topology.topology.cluster.terminals.forEach {
+                topology.getOrCreateNode(it)
+            }
+            println(topology.toGraphviz(PrettyPrinter()))
+            val distanceMatrix = topology.topology.cluster.distanceMatrix
+            File("distances.txt").writeText(distanceMatrix.print())
+            println("Distance Matrix is written to distances.txt")
         }
         "phylogeny" -> {
             val phylogeny = model.computePhylogeny(taxonList)
             phylogeny.unify()
-            println(phylogeny.cluster.toGraphviz())
+            phylogeny.cluster.label()
+            println(phylogeny.cluster.toGraphviz(PrettyPrinter()))
+            File("distances.txt").writeText(phylogeny.cluster.distanceMatrix.print())
         }
         else -> error("Unknown computed output format")
     }

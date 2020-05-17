@@ -2,10 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
-import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
-import ru.ifmo.ctd.novik.phylogeny.utils.logger
-import ru.ifmo.ctd.novik.phylogeny.utils.mergeTwoEdges
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 class CancelRecombinationModification : Modification {
 
@@ -19,6 +16,9 @@ class CancelRecombinationModification : Modification {
 
         val group = usedGroups.random(GlobalRandom)
         val (recombination, midNode, _, path) = group.ambassador!!
+
+        if (path.first() !in topology.topology.cluster || path.last() !in topology.topology.cluster)
+            return topology
 
         log.info { "Canceling recombination: $recombination" }
 
@@ -37,11 +37,15 @@ class CancelRecombinationModification : Modification {
         secondParent.node.neighbors.remove(midNode.node)
 
         midNode.removeIf { edge -> edge.end === firstParent || edge.end === secondParent || edge.end === child }
+        midNode.node.neighbors.remove(firstParent.node)
+        midNode.node.neighbors.remove(secondParent.node)
         val edgeToMidNode = child.edges.find { it.end === midNode }
         if (edgeToMidNode != null) {
-            for (i in 1 until edgeToMidNode.nodes.lastIndex) {
-                val node = edgeToMidNode.nodes[i]
-                node.neighbors.forEach { neighbor -> neighbor.neighbors.removeIf { it === node } }
+            val nodes = edgeToMidNode.nodes
+            nodes[0].neighbors.remove(nodes[1])
+            nodes[nodes.lastIndex].neighbors.remove(nodes[nodes.lastIndex - 1])
+            for (i in 1 until nodes.lastIndex) {
+                val node = nodes[i]
                 topology.topology.cluster.nodes.remove(node)
             }
 
@@ -49,16 +53,29 @@ class CancelRecombinationModification : Modification {
             child.remove(edgeToMidNode)
         }
 
-        if (midNode.edges.isEmpty()) {
+        if (midNode !== child && midNode.edges.isEmpty()) {
             topology.topology.nodes.remove(midNode)
-            topology.topology.cluster.nodes.remove(midNode.node)
+
+            val node = midNode.node
+
+            debug {
+                log.info { "Removing $node" }
+            }
+            node.neighbors.forEach { neighbor -> neighbor.neighbors.removeIf { it === node } }
+            topology.topology.cluster.nodes.remove(node)
         }
 
-        var current = recombination.child
-        for (i in 1 until path.size) {
-            val node = path[i]
-            createEdge(current, node)
-            current = node
+        log.info { "Recreated path: ${path.joinToString(" ")}" }
+
+        debug {
+            for (i in 1 until path.lastIndex) {
+                if (path[i].neighbors.size != 0)
+                    error("Node for recreated path ${path[i]} has neighbors")
+            }
+        }
+
+        for (i in 1 .. path.lastIndex) {
+            createEdge(path[i - 1], path[i])
         }
 
         for (i in 1 until path.lastIndex){
@@ -72,11 +89,11 @@ class CancelRecombinationModification : Modification {
         endNode.add(revNewEdge, directed = true)
         topology.topology.add(Pair(newEdge, revNewEdge))
 
+        group.setUnused()
+
         topology.mergeTwoEdges(firstParent)
         topology.mergeTwoEdges(secondParent)
         topology.mergeTwoEdges(child)
-
-        group.setUnused()
 
         return topology
     }

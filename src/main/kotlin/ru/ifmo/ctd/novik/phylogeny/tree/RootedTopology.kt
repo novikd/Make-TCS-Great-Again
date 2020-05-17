@@ -17,6 +17,12 @@ data class RootedTopology(
     val genomes: List<Pair<Node, String>>
         get() = topology.cluster.map { node -> node to node.genome.primary }
 
+    val recombinationEdges: Set<Edge>
+        get() = recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges }.toSet()
+
+    val recombinationEdgesOnly: Set<Edge>
+        get() = recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges.takeLast(2) }.toSet()
+
     companion object {
         val log = logger()
     }
@@ -32,6 +38,9 @@ data class RootedTopology(
             newStart.next.add(newEdge)
         }
 
+        debug {
+            log.info { "Cloning recombination groups" }
+        }
         val newRecombinationGroups = mutableListOf<RecombinationGroup>()
         recombinationGroups.forEach { group ->
             val newElements = mutableListOf<Recombination>()
@@ -47,17 +56,37 @@ data class RootedTopology(
             if (group.isUsed != newGroup.isUsed)
                 error("Group usage info lost")
             if (group.isUsed) {
+                debug {
+                    log.info { "Cloning used recombination group" }
+                }
                 val (recombination, midNode, createdEdges, deletedPath) = group.ambassador!!
+                debug {
+                    log.info { "Cloning deleted path: ${deletedPath.joinToString(" ")}" }
+                }
+
                 val newDeletedPath = mutableListOf(generation[deletedPath.first()]!!)
                 for (i in 1 until deletedPath.lastIndex) {
-                    newDeletedPath.add(deletedPath[i])
+                    newDeletedPath.add(generation.computeIfAbsent(deletedPath[i]) { old -> old.copy() })
                 }
-                newDeletedPath.add(generation[deletedPath.last()]!!)
+                newDeletedPath.add(generation.computeIfAbsent(deletedPath.last()) { old -> old.copy() })
 
+                debug {
+                    for (i in 1 until newDeletedPath.lastIndex) {
+                        if (newDeletedPath[i].neighbors.size != 0)
+                            error("Node for copied path ${newDeletedPath[i]} has neighbors")
+                    }
+                }
+
+                debug {
+                    log.info { "Cloning created edges" }
+                }
                 val newCreatedEdges = createdEdges.map { edge ->
                     topGeneration[edge.start]!!.next.first { it.end === topGeneration[edge.end]!! }
                 }
 
+                debug {
+                    log.info { "Cloning recombination ambassador" }
+                }
                 newGroup.ambassador = RecombinationGroupAmbassador(
                         Recombination(
                                 generation[recombination.firstParent]!!,

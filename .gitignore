@@ -4,3 +4,4 @@
 /build/
 samples/*.out
 input.txt
+/simulated/

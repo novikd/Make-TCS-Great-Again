@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.models
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import ru.ifmo.ctd.novik.phylogeny.base.AbstractTestWithOutputFile
+import ru.ifmo.ctd.novik.phylogeny.io.output.VerbosePrinter
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 import kotlin.random.Random
 
@@ -23,7 +24,7 @@ abstract class AbstractModelTest : AbstractTestWithOutputFile() {
         runTestsWithOutput {
             val model = phylogeneticModel.create()
             val phylogeneticTree = model.evaluateSimpleData(this).cluster
-            phylogeneticTree.toGraphviz()
+            phylogeneticTree.toGraphviz(VerbosePrinter())
         }
     }
 }

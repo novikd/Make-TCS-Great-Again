@@ -1,14 +1,16 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
 import ru.ifmo.ctd.novik.phylogeny.common.*
+import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
+import ru.ifmo.ctd.novik.phylogeny.io.output.Printer
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import java.util.*
 
-fun Cluster.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
-fun Topology.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
-fun RootedPhylogeny.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
-fun RootedTopology.toGraphviz(): String = GraphvizOutputClusterVisitor().visit(this)
+fun Cluster.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
+fun Topology.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
+fun RootedPhylogeny.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
+fun RootedTopology.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
 
 fun Cluster.traverse(action: (Node.() -> Unit)) {
     val visited = mutableSetOf<Node>()
@@ -83,6 +85,19 @@ fun Cluster.label(): Cluster {
     val length = this.terminals.first().taxon.genome.primary.length
     val labeled = nodes.filter { !it.genome.isEmpty && it.neighbors.any { node -> node.genome.isEmpty } }
 
+    val nodesWithOptions = nodes.filter { it.genome.size > 1 }
+    for (node in nodesWithOptions) {
+        if (node.genome.size == 1)
+            continue
+        val genome = node.genome as MutableGenome
+        genome.replace(listOf(genome.primary))
+        node.bfs({ v -> v.genome.size > 1 }) { prev, curr ->
+            val currGenome = curr.genome as MutableGenome
+            val currOption = currGenome.first { hammingDistance(it, prev.genome.primary) == 1 }
+            currGenome.replace(listOf(currOption))
+        }
+    }
+
     labeled.forEach { node ->
         val genome = node.genome.primary
         labels[node] = Array(length) { mutableSetOf(genome[it]) }
@@ -150,6 +165,30 @@ fun Cluster.label(): Cluster {
     }
 
     return this
+}
+
+typealias DistanceMatrix = Map<Node, Map<Node, Int>>
+
+val Cluster.distanceMatrix: DistanceMatrix
+    get() {
+        val result = mutableMapOf<Node, Map<Node, Int>>()
+        terminals.forEach { terminalNode ->
+            result[terminalNode] = terminalNode.computeGraphDistances()
+        }
+        return result
+    }
+
+fun DistanceMatrix.print(): String {
+    val comparator = Comparator<Node> { o1, o2 -> o1!!.taxon.id.compareTo(o2!!.taxon.id) }
+
+    val sorted = this.toSortedMap(comparator)
+    return buildString {
+        append("${sorted.size}\n")
+        for ((_, distances) in sorted) {
+            val sortedDistances = distances.toSortedMap(comparator)
+            append(sortedDistances.values.joinToString(separator = " ", postfix = "\n"))
+        }
+    }
 }
 
 fun Phylogeny.directed(): RootedPhylogeny {
@@ -380,6 +419,9 @@ fun Edge.split(node: Node): SplitResult {
 fun RootedTopology.mergeTwoEdges(child: TopologyNode) {
     if (child.edges.size != 2 || child.next.size != 1)
         return
+    if (recombinationEdges.any { it.start === child || it.end === child })
+        return
+
     val outEdge = child.next.first()
     val inEdge = child.edges.first { it.end !== outEdge.end }
 

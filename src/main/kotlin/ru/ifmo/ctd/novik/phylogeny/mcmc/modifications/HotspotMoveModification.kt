@@ -5,7 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
-private const val HOTSPOT_DISTANCE_THRESHOLD = 0.03
+const val HOTSPOT_DISTANCE_THRESHOLD = 0.10
 
 class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
@@ -151,6 +151,7 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
             }
             topology.recombinationGroups.removeIf { group -> group.elements.isEmpty() }
             node.neighbors.forEach { it.neighbors.remove(node) }
+            node.neighbors.clear()
             topology.topology.cluster.nodes.remove(node)
         }
 
@@ -166,11 +167,19 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
             topologyNode.add(newEdge)
             parent.add(revNewEdge, directed = true)
-            createdEdges.add(newEdge)
+            createdEdges.add(revNewEdge)
         } else {
             deletedPath.add(parent.node)
             topology.mergeTwoEdges(parent)
         }
+
+        debug {
+            for (i in 1 until deletedPath.lastIndex) {
+                if (deletedPath[i].neighbors.size != 0)
+                    error("Deleted node ${deletedPath[i]} has neighbors")
+            }
+        }
+
         return true
     }
 

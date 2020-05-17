@@ -17,6 +17,8 @@ data class Node(val taxon: Taxon) {
     constructor() : this(createTaxon())
 
     fun connect(node: Node) {
+        if (neighbors.contains(node))
+            error("Already existed neighbor")
         neighbors.add(node)
     }
 
@@ -35,7 +37,7 @@ data class Node(val taxon: Taxon) {
     }
 }
 
-inline fun Node.bfs(shouldVisit: (Node) -> Boolean, action: (Node, Node) -> Unit) {
+inline fun Node.bfs(shouldVisit: (Node) -> Boolean, action: (prev: Node, node: Node) -> Unit) {
     val queue = ArrayDeque<Node>()
     queue.add(this)
 

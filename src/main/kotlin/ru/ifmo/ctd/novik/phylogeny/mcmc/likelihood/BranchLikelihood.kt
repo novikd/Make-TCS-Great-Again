@@ -17,7 +17,7 @@ class BranchLikelihood(lambda: Double) : Likelihood {
     }
 
     override operator fun invoke(topology: RootedTopology): Double {
-        val recombinationEdges = topology.recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges }.toSet()
+        val recombinationEdges = topology.recombinationEdgesOnly
         val result = topology.edges.filter { it !in recombinationEdges }.map { computeEdgeLikelihood(it) }.sum()
         debug { log.info { "Branch likelihood: $result" } }
         return result
@@ -25,11 +25,19 @@ class BranchLikelihood(lambda: Double) : Likelihood {
 
     private fun computeEdgeLikelihood(edge: Edge): Double {
         var result = poisson(edge.length)
+        var substitutions = 0
         edge.nodes.zipWithNext { a, b ->
-            result += a.genome.primary.zip(b.genome.primary).filter { (lhs, rhs) ->
+            val differentPositions = a.genome.primary.zip(b.genome.primary).filter { (lhs, rhs) ->
                 lhs != rhs
-            }.map { ln(SubstitutionModel.nucleotideProbability[it.second]!!) }.fold(0.0, Double::plus)
-//            }.map { ln(SubstitutionModel.relativeSubstitutionProbability[it.first]!![it.second]!!) }.fold(0.0, Double::plus)
+            }
+            substitutions += differentPositions.size
+            result += differentPositions
+                    .map { ln(SubstitutionModel.substitutionProbability(it.first, it.second)) }
+                    .fold(0.0, Double::plus)
+        }
+        if (substitutions != edge.length) {
+            log.info { "Edge has mutual options: ${edge.nodes.any { it.genome.size > 1 }}" }
+            log.info { "Edge with ${substitutions - edge.length}" }
         }
         return result
     }
