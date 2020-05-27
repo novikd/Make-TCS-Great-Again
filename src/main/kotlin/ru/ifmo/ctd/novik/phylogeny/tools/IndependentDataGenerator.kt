@@ -1,9 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.tools
 
-import ru.ifmo.ctd.novik.phylogeny.common.Genome
-import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
-import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
-import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.common.*
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.io.output.PrettyPrinter
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.BranchLikelihood
@@ -33,7 +30,7 @@ val graphvizOutputFile = File("simulated/graphviz.dot")
 val distancesOutputFile = File("simulated/distances.txt")
 val sequencesOutputFile = File("simulated/sequences.fas")
 
-class IndependentDataGenerator {
+class IndependentDataGenerator(val output: Boolean = true) {
     private var id = 0
 
     val initialGenome: String by lazy {
@@ -126,17 +123,21 @@ class IndependentDataGenerator {
     }
 
     private fun performRecombination(hotspot: Int, firstParent: TopologyNode, secondParent: TopologyNode): TopologyNode {
-        recombinationOutputFile.appendText("Recombination at $hotspot site: ${firstParent.node} and ${secondParent.node}\n")
+        if (output)
+            recombinationOutputFile.appendText("Recombination at $hotspot site: ${firstParent.node} and ${secondParent.node}\n")
 
         val childPrefix = firstParent.genome.primary.substring(0, hotspot)
         val secondParentPrefix = secondParent.genome.primary.substring(0, hotspot)
-        recombinationOutputFile.appendText("Prefix hamming: ${hammingDistance(childPrefix, secondParentPrefix)}\n")
+        if (output)
+            recombinationOutputFile.appendText("Prefix hamming: ${hammingDistance(childPrefix, secondParentPrefix)}\n")
         val childSuffix = secondParent.genome.primary.substring(hotspot)
         val firstParentSuffix = firstParent.genome.primary.substring(hotspot)
-        recombinationOutputFile.appendText("Suffix hamming: ${hammingDistance(firstParentSuffix, childSuffix)}\n")
+        if (output)
+            recombinationOutputFile.appendText("Suffix hamming: ${hammingDistance(firstParentSuffix, childSuffix)}\n")
 
         val child = createNode(childPrefix + childSuffix)
-        recombinationOutputFile.appendText("Child: ${child.node}\n")
+        if (output)
+            recombinationOutputFile.appendText("Child: ${child.node}\n")
         createEdge(firstParent.node, child.node)
         createEdge(secondParent.node, child.node)
 
@@ -178,7 +179,7 @@ class IndependentDataGenerator {
         val path = mutableListOf(parent.node)
 
         val mutationPositions = mutableListOf<Int>()
-        for (i in 0 until mutations) {
+        while (mutationPositions.size != mutations) {
             val index = builder.indices.random(LOCAL_RANDOM)
             if (index !in mutationPositions)
                 mutationPositions.add(index)
@@ -224,15 +225,14 @@ class IndependentDataGenerator {
     }
 }
 
-fun main() {
-    val generator = IndependentDataGenerator()
-    if (!outputDirectory.exists()) {
-        outputDirectory.mkdir()
-    }
+data class GenerationResult(
+        val genomes: MutableList<TopologyNode>,
+        val cluster: Cluster,
+        val topology: Topology,
+        val rootedTopology: RootedTopology
+)
 
-    recombinationOutputFile.writeText("Hotspots: ${generator.hotspots.joinToString(separator = " ")}\n")
-//    recombinationOutputFile.writeText("")
-
+fun generate(generator: IndependentDataGenerator): GenerationResult {
     val genomes = generator.generate()
 
     val cluster = SimpleCluster((genomes.map { it.node } + generator.nodes).toMutableList())
@@ -247,7 +247,28 @@ fun main() {
         val secondParent = topology.nodes.first { it.node === recombination.secondParent }
         edges.add(firstParent.next.first { it.end === child })
         edges.add(secondParent.next.first { it.end === child })
-        group.ambassador = RecombinationGroupAmbassador(recombination, child, edges, emptyList())
+
+        val parentFromDeletedPath = cluster.nodes.minBy {
+            val distance = hammingDistance(it.genome.primary, child.genome.primary)
+            if (distance == 0)
+                Int.MAX_VALUE
+            else
+                distance
+        }!!
+
+        val deletedPath = mutableListOf(child.node)
+        val positions = computeDistinctPositions(parentFromDeletedPath.taxon, child.node.taxon)
+        for (i in 0 until positions.size - 1) {
+            val pos = positions[i]
+            val builder = StringBuilder(deletedPath.last().genome.primary)
+            builder[pos] = parentFromDeletedPath.genome.primary[pos]
+            val node = Node()
+            (node.genome as MutableGenome).add(builder.toString())
+            deletedPath.add(node)
+        }
+        deletedPath.add(parentFromDeletedPath)
+
+        group.ambassador = RecombinationGroupAmbassador(recombination, child, edges, deletedPath)
         recombinationGroups.add(group)
     }
 
@@ -257,6 +278,20 @@ fun main() {
     for (i in range) {
         rootedTopology.mergeTwoEdges(genomes[i])
     }
+
+    return GenerationResult(genomes, cluster, topology, rootedTopology)
+}
+
+fun main() {
+    val generator = IndependentDataGenerator()
+    if (!outputDirectory.exists()) {
+        outputDirectory.mkdir()
+    }
+
+    recombinationOutputFile.writeText("Hotspots: ${generator.hotspots.joinToString(separator = " ")}\n")
+//    recombinationOutputFile.writeText("")
+
+    val (genomes, cluster, topology, rootedTopology) = generate(generator)
 
     val likelihood = BranchLikelihood(GENOME_LENGTH * SubstitutionModel.mutationRate) *
             RecombinationLikelihood(P_RECOMBINATION * genomes.size)

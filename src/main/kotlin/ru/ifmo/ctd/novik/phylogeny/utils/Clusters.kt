@@ -178,6 +178,17 @@ val Cluster.distanceMatrix: DistanceMatrix
         return result
     }
 
+val RootedTopology.distanceMatrix: DistanceMatrix
+    get() = topology.cluster.distanceMatrix
+
+fun DistanceMatrix.toArrays(): Array<IntArray> {
+    val comparator = Comparator<Node> { o1, o2 -> o1!!.taxon.id.compareTo(o2!!.taxon.id) }
+    val sorted = this.toSortedMap(comparator)
+    return sorted.map { (_, distances) ->
+        distances.toSortedMap(comparator).values.toIntArray()
+    }.toTypedArray()
+}
+
 fun DistanceMatrix.print(): String {
     val comparator = Comparator<Node> { o1, o2 -> o1!!.taxon.id.compareTo(o2!!.taxon.id) }
 
