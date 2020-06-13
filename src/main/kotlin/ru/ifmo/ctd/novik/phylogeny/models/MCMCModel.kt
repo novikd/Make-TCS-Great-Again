@@ -13,7 +13,7 @@ import ru.ifmo.ctd.novik.phylogeny.tools.RESULT_GENOMES_NUMBER
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
-class MCMCModel(val hotspots: List<Int>) : IModel {
+class MCMCModel(val hotspots: List<Int>, val iterations: Int = 10_000) : IModel {
     override fun computePhylogeny(taxonList: List<Taxon>): Phylogeny {
         TODO("Not yet implemented")
     }
@@ -35,7 +35,7 @@ class MCMCModel(val hotspots: List<Int>) : IModel {
                 HotspotMoveModification(hotspots.toMutableList()),
                 CancelRecombinationModification()
         )
-        val mcmc = MCMC(likelihood, modifications)
+        val mcmc = MCMC(likelihood, modifications, iterations)
         return mcmc.simulation(baseTopology.toRooted())
     }
 }

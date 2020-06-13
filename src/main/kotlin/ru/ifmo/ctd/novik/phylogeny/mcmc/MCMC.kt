@@ -28,10 +28,13 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
         var currentLikelihood = likelihood(currentTopology)
 
         log.info { "\n******* START MCMC SIMULATION *******\nInitial likelihood: $currentLikelihood\n" }
-        likelihoodDump.writeText("ITER; LIKELIHOOD\n")
-
+        debug {
+            likelihoodDump.writeText("ITER; LIKELIHOOD\n")
+        }
         while (!shouldStop()) {
-            likelihoodDump.appendText("$iter; $currentLikelihood\n")
+            debug {
+                likelihoodDump.appendText("$iter; $currentLikelihood\n")
+            }
             ++iter
             val modification = modifications.random(GlobalRandom)
             val newTopology = modification(currentTopology.clone())

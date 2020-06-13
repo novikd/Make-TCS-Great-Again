@@ -14,7 +14,7 @@ import ru.ifmo.ctd.novik.phylogeny.models.*
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import java.util.logging.Logger
 
-var DEBUG_ENABLED = true
+var DEBUG_ENABLED = false
 
 inline fun debug(action: () -> Unit) {
     if (DEBUG_ENABLED)
