@@ -7,14 +7,17 @@ import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
 import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
 import ru.ifmo.ctd.novik.phylogeny.utils.debug
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
+import java.io.File
+import java.nio.file.Files
 import kotlin.math.ln
 import kotlin.math.min
 
-class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, private val maxIterations: Int = 1_000) {
+class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, private val maxIterations: Int = 10_000) {
     private var iter: Int = 0
 
     companion object {
         val log = logger()
+        val likelihoodDump = File("likelihood_dump.csv")
     }
 
     private fun shouldStop(): Boolean = iter == maxIterations
@@ -25,8 +28,10 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
         var currentLikelihood = likelihood(currentTopology)
 
         log.info { "\n******* START MCMC SIMULATION *******\nInitial likelihood: $currentLikelihood\n" }
+        likelihoodDump.writeText("ITER; LIKELIHOOD\n")
 
         while (!shouldStop()) {
+            likelihoodDump.appendText("$iter; $currentLikelihood\n")
             ++iter
             val modification = modifications.random(GlobalRandom)
             val newTopology = modification(currentTopology.clone())

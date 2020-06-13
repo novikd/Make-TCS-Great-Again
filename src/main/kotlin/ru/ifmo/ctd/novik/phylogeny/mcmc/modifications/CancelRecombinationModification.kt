@@ -11,11 +11,10 @@ class CancelRecombinationModification : Modification {
     }
 
     override fun invoke(topology: RootedTopology): RootedTopology {
-        val usedGroups = topology.recombinationGroups.filter { it.isUsed }
-        if (usedGroups.isEmpty()) return topology
+        if (topology.recombinationAmbassadors.isEmpty()) return topology
 
-        val group = usedGroups.random(GlobalRandom)
-        val (recombination, midNode, _, path) = group.ambassador!!
+        val ambassador = topology.recombinationAmbassadors.random(GlobalRandom)
+        val (recombination, midNode, _, path) = ambassador
 
         if (path.first() !in topology.topology.cluster || path.last() !in topology.topology.cluster)
             return topology
@@ -89,11 +88,11 @@ class CancelRecombinationModification : Modification {
         endNode.add(revNewEdge, directed = true)
         topology.topology.add(Pair(newEdge, revNewEdge))
 
-        group.setUnused()
-
         topology.mergeTwoEdges(firstParent)
         topology.mergeTwoEdges(secondParent)
         topology.mergeTwoEdges(child)
+
+        topology.recombinationAmbassadors.remove(ambassador)
 
         return topology
     }

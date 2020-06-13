@@ -16,13 +16,13 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.random.Random
 
-private val LOCAL_RANDOM = Random(228)
+private val LOCAL_RANDOM = Random(1234758)
 
-const val P_RECOMBINATION = 0.1
+const val P_RECOMBINATION = 0.10
 
-const val RESULT_GENOMES_NUMBER = 20
+const val RESULT_GENOMES_NUMBER = 30
 
-const val GENOME_LENGTH = 150
+const val GENOME_LENGTH = 1000
 
 val outputDirectory = File("simulated")
 val recombinationOutputFile = File("simulated/recombination.txt")
@@ -54,12 +54,14 @@ class IndependentDataGenerator(val output: Boolean = true) {
     val genomes = mutableSetOf<String>()
     val edges = mutableListOf<Pair<Edge, Edge>>()
     val recombinations = mutableListOf<Recombination>()
+    val leafs = mutableListOf<TopologyNode>()
 
     fun generate(): MutableList<TopologyNode> {
         val currentLeafs = mutableListOf(createNode(initialGenome))
         val topologyNodes = mutableListOf(currentLeafs.first())
         while (currentLeafs.size < RESULT_GENOMES_NUMBER) {
             val isRecombination = currentLeafs.size > 1 && LOCAL_RANDOM.nextDouble() <= P_RECOMBINATION
+            println(isRecombination)
             if (isRecombination) {
                 val hotspot = hotspots.random(LOCAL_RANDOM)
 
@@ -86,6 +88,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
                 performSpeciation(currentLeafs, topologyNodes)
             }
         }
+        leafs.addAll(currentLeafs)
         return topologyNodes
     }
 
@@ -119,6 +122,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
                     && suffix >= HOTSPOT_DISTANCE_THRESHOLD * GENOME_LENGTH)
                 return parents
         }
+        println("Fail")
         return null
     }
 
@@ -154,7 +158,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
         edges.add(Pair(edgeFromFirstParent, reversedFromFirstParent))
         edges.add(Pair(edgeFromSecondParent, reversedFromSecondParent))
 
-        recombinations.add(Recombination(firstParent.node, secondParent.node, child.node, hotspot))
+        recombinations.add(Recombination(firstParent.node, secondParent.node, child.node, hotspot, 0))
         return child
     }
 
@@ -238,9 +242,8 @@ fun generate(generator: IndependentDataGenerator): GenerationResult {
     val cluster = SimpleCluster((genomes.map { it.node } + generator.nodes).toMutableList())
     val topology = Topology(cluster, genomes.toMutableList(), generator.edges)
 
-    val recombinationGroups = mutableListOf<RecombinationGroup>()
+    val recombinationAmbassadors = mutableListOf<RecombinationGroupAmbassador>()
     generator.recombinations.forEach { recombination ->
-        val group = RecombinationGroup(recombination.pos, mutableListOf(recombination), true)
         val child = topology.first { it.node === recombination.child }
         val edges = mutableListOf<Edge>()
         val firstParent = topology.nodes.first { it.node === recombination.firstParent }
@@ -268,11 +271,10 @@ fun generate(generator: IndependentDataGenerator): GenerationResult {
         }
         deletedPath.add(parentFromDeletedPath)
 
-        group.ambassador = RecombinationGroupAmbassador(recombination, child, edges, deletedPath)
-        recombinationGroups.add(group)
+        recombinationAmbassadors.add(RecombinationGroupAmbassador(recombination, child, edges, deletedPath))
     }
 
-    val rootedTopology = RootedTopology(topology, genomes[0], recombinationGroups)
+    val rootedTopology = RootedTopology(topology, genomes[0], recombinationAmbassadors)
     val range = 1 until genomes.size
 
     for (i in range) {
@@ -301,8 +303,14 @@ fun main() {
 
     graphvizOutputFile.writeText(rootedTopology.toGraphviz(PrettyPrinter()))
 
-    distancesOutputFile.writeText(topology.cluster.distanceMatrix.print())
-    sequencesOutputFile.writeText(genomes.joinToString(separator = "\n") { ">${it.node}\n${it.genome.primary}" })
+    val matrix = topology.cluster.distanceMatrix
+    val temp = matrix.filter { a -> generator.leafs.any { it.node === a.key } }
+    val resultMatrix = mutableMapOf<Node, Map<Node, Int>>()
+    temp.forEach { map ->
+        resultMatrix[map.key] = map.value.filter { a -> generator.leafs.any { it.node === a.key } }
+    }
+    distancesOutputFile.writeText(resultMatrix.print())
+    sequencesOutputFile.writeText(generator.leafs.joinToString(separator = "\n") { ">${it.node}\n${it.genome.primary}" })
 
     println(cluster.toList().size)
     println(cluster.distinct().size)

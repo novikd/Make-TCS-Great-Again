@@ -5,7 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.*
 data class RootedTopology(
         val topology: Topology,
         val root: TopologyNode,
-        val recombinationGroups: MutableList<RecombinationGroup> = mutableListOf()
+        val recombinationAmbassadors: MutableList<RecombinationGroupAmbassador> = mutableListOf()
 ) {
 
     val nodes: List<TopologyNode>
@@ -18,10 +18,10 @@ data class RootedTopology(
         get() = topology.cluster.map { node -> node to node.genome.primary }
 
     val recombinationEdges: Set<Edge>
-        get() = recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges }.toSet()
+        get() = recombinationAmbassadors.flatMap { it.edges }.toSet()
 
     val recombinationEdgesOnly: Set<Edge>
-        get() = recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges.takeLast(2) }.toSet()
+        get() = recombinationAmbassadors.flatMap { it.edges.takeLast(2) }.toSet()
 
     companion object {
         val log = logger()
@@ -39,83 +39,62 @@ data class RootedTopology(
         }
 
         debug {
-            log.info { "Cloning recombination groups" }
+            log.info { "Cloning recombination group ambassadors" }
         }
-        val newRecombinationGroups = mutableListOf<RecombinationGroup>()
-        recombinationGroups.forEach { group ->
-            val newElements = mutableListOf<Recombination>()
-            group.elements.forEach {
-                newElements.add(Recombination(
-                        generation[it.firstParent]!!,
-                        generation[it.secondParent]!!,
-                        generation[it.child]!!,
-                        it.pos))
+        val newRecombinationAmbassadors = mutableListOf<RecombinationGroupAmbassador>()
+        recombinationAmbassadors.forEach { ambassador ->
+            debug {
+                log.info { "Cloning ambassador $ambassador" }
+            }
+            val (recombination, midNode, createdEdges, deletedPath) = ambassador
+            debug {
+                log.info { "Cloning deleted path: ${deletedPath.joinToString(" ")}" }
             }
 
-            val newGroup = group.copy(elements = newElements)
-            if (group.isUsed != newGroup.isUsed)
-                error("Group usage info lost")
-            if (group.isUsed) {
-                debug {
-                    log.info { "Cloning used recombination group" }
-                }
-                val (recombination, midNode, createdEdges, deletedPath) = group.ambassador!!
-                debug {
-                    log.info { "Cloning deleted path: ${deletedPath.joinToString(" ")}" }
-                }
+            val newDeletedPath = mutableListOf(generation[deletedPath.first()]!!)
+            for (i in 1 until deletedPath.lastIndex) {
+                newDeletedPath.add(generation.computeIfAbsent(deletedPath[i]) { old -> old.copy() })
+            }
+            newDeletedPath.add(generation.computeIfAbsent(deletedPath.last()) { old -> old.copy() })
 
-                val newDeletedPath = mutableListOf(generation[deletedPath.first()]!!)
-                for (i in 1 until deletedPath.lastIndex) {
-                    newDeletedPath.add(generation.computeIfAbsent(deletedPath[i]) { old -> old.copy() })
+            debug {
+                for (i in 1 until newDeletedPath.lastIndex) {
+                    if (newDeletedPath[i].neighbors.size != 0)
+                        error("Node for copied path ${newDeletedPath[i]} has neighbors")
                 }
-                newDeletedPath.add(generation.computeIfAbsent(deletedPath.last()) { old -> old.copy() })
-
-                debug {
-                    for (i in 1 until newDeletedPath.lastIndex) {
-                        if (newDeletedPath[i].neighbors.size != 0)
-                            error("Node for copied path ${newDeletedPath[i]} has neighbors")
-                    }
-                }
-
-                debug {
-                    log.info { "Cloning created edges" }
-                }
-                val newCreatedEdges = createdEdges.map { edge ->
-                    topGeneration[edge.start]!!.next.first { it.end === topGeneration[edge.end]!! }
-                }
-
-                debug {
-                    log.info { "Cloning recombination ambassador" }
-                }
-                newGroup.ambassador = RecombinationGroupAmbassador(
-                        Recombination(
-                                generation[recombination.firstParent]!!,
-                                generation[recombination.secondParent]!!,
-                                generation[recombination.child]!!,
-                                recombination.pos),
-                        topGeneration[midNode]!!,
-                        newCreatedEdges,
-                        newDeletedPath
-                )
             }
 
-            newRecombinationGroups.add(newGroup)
+            debug {
+                log.info { "Cloning created edges" }
+            }
+            val newCreatedEdges = createdEdges.map { edge ->
+                topGeneration[edge.start]!!.next.first { it.end === topGeneration[edge.end]!! }
+            }
+
+            debug {
+                log.info { "Cloning recombination ambassador" }
+            }
+            val newAmbassador = RecombinationGroupAmbassador(
+                    Recombination(
+                            generation[recombination.firstParent]!!,
+                            generation[recombination.secondParent]!!,
+                            generation[recombination.child]!!,
+                            recombination.pos,
+                            recombination.childIndex),
+                    topGeneration[midNode]!!,
+                    newCreatedEdges,
+                    newDeletedPath
+            )
+            newRecombinationAmbassadors.add(newAmbassador)
         }
 
-        val newRootedTopology = RootedTopology(newTopology, newRoot, newRecombinationGroups)
+        val newRootedTopology = RootedTopology(newTopology, newRoot, newRecombinationAmbassadors)
         debug {
             if (edges.size != newRootedTopology.edges.size)
                 error("Edges number must be equal")
             newRootedTopology.checkInvariant()
         }
         return newRootedTopology
-    }
-
-    fun add(recombination: Recombination): RecombinationGroup {
-        val group = getRecombinationGroup(recombination)
-
-        group.add(recombination)
-        return group
     }
 
     fun getOrCreateNode(node: Node): TopologyNode {
@@ -133,20 +112,7 @@ data class RootedTopology(
         return newNode
     }
 
-    private fun getRecombinationGroup(recombination: Recombination): RecombinationGroup {
-        val group = recombinationGroups.find { recombination in it }
-        if (group != null) {
-            log.info {
-                "Reuse recombination group: { ${recombination.firstParent.nodeName} + ${recombination.secondParent.nodeName} -> ${recombination.child.nodeName} }"
-            }
-            return group
-        }
-
-        log.info {
-            "New recombination group: { ${recombination.firstParent.nodeName} + ${recombination.secondParent.nodeName} -> ${recombination.child.nodeName} }"
-        }
-        val newGroup = RecombinationGroup(recombination.pos)
-        recombinationGroups.add(newGroup)
-        return newGroup
+    fun add(ambassador: RecombinationGroupAmbassador) {
+        recombinationAmbassadors.add(ambassador)
     }
 }

@@ -1,34 +1,26 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
+import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
+import ru.ifmo.ctd.novik.phylogeny.utils.delete
+import ru.ifmo.ctd.novik.phylogeny.utils.logger
 
-class NNIModification : Modification {
-    override fun invoke(topology: RootedTopology): RootedTopology {
-        val recombinationEdges = topology.recombinationGroups.filter { it.isUsed }.flatMap { it.ambassador!!.edges }
+class NNIModification : TreeRearrangement() {
 
-        val filteredEdges = topology.edges.filter { edge -> edge.start.edges.size > 2 && edge.end.edges.size > 2  && edge !in recombinationEdges}
+    companion object {
+        val log = logger()
+    }
 
-        if (filteredEdges.isNotEmpty()) {
-            val edge = filteredEdges.random(GlobalRandom)
+    override fun apply(startEdge: Edge, endEdge: Edge, topology: RootedTopology) {
+        log.info { "Chosen edges: $startEdge $endEdge" }
 
-            val startNode = edge.start
-            val endNode = edge.end
+        val startNode = startEdge.start
+        val endNode = endEdge.start
 
-            // TODO: look only on outgoing edges
-            val startEdge = startNode.next.filterNot { it === edge }.random(GlobalRandom)
-            val endEdge = endNode.next.filterNot { it.end == startNode }.random(GlobalRandom)
+        startEdge.delete(topology)
+        endEdge.delete(topology)
 
-            val newEndEdge = startEdge.copy(start = endNode)
-            val newStartEdge = endEdge.copy(start = startNode)
-
-            startNode.edges.remove(edge)
-            endNode.edges.removeIf { it.end === startNode }
-
-            startNode.add(newStartEdge)
-            endNode.add(newEndEdge)
-        }
-
-        return topology
+        createNewEdge(startNode, endEdge.end, topology)
+        createNewEdge(endNode, startEdge.end, topology)
     }
 }

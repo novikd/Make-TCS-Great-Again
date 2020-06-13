@@ -47,11 +47,12 @@ fun main(args: Array<String>) {
             val distanceMatrix = topology.topology.cluster.distanceMatrix
             File("distances.txt").writeText(distanceMatrix.print())
             println("Distance Matrix is written to distances.txt")
+            println(topology.toNewick())
         }
         "phylogeny" -> {
             val phylogeny = model.computePhylogeny(taxonList)
             phylogeny.unify()
-            phylogeny.cluster.label()
+//            phylogeny.cluster.label()
             println(phylogeny.cluster.toGraphviz(PrettyPrinter()))
             File("distances.txt").writeText(phylogeny.cluster.distanceMatrix.print())
         }

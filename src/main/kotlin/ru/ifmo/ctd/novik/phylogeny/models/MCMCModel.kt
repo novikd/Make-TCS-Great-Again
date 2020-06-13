@@ -30,7 +30,8 @@ class MCMCModel(val hotspots: List<Int>) : IModel {
         val likelihood = BranchLikelihood(length * SubstitutionModel.mutationRate) * RecombinationLikelihood(P_RECOMBINATION * taxonList.size)
         val modifications = listOf(
                 ChangeRootModification(),
-//                NNIModification(),
+                NNIModification(),
+                SPRModification(),
                 HotspotMoveModification(hotspots.toMutableList()),
                 CancelRecombinationModification()
         )

@@ -8,6 +8,8 @@ import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingResult
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
+import ru.ifmo.ctd.novik.phylogeny.utils.toRooted
+import ru.ifmo.ctd.novik.phylogeny.utils.topology
 
 /**
  * @author Novik Dmitry ITMO University
@@ -20,7 +22,7 @@ abstract class AbstractDistanceBasedModel : IModel {
     }
 
     protected abstract fun createClusters(taxonList: List<Taxon>): MutableList<Cluster>
-    protected abstract fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate
+    protected abstract fun createMergingCandidate(first: Cluster, second: Cluster, genomNumber: Int): MergingCandidate
     protected abstract fun mergeClusters(mergingCandidate: MergingCandidate): MergingResult
 
     override fun computePhylogeny(taxonList: List<Taxon>): Phylogeny {
@@ -30,11 +32,12 @@ abstract class AbstractDistanceBasedModel : IModel {
         while (clusters.size > 1) {
             var currentCandidate: MergingCandidate = defaultMergingCandidate
 
+            val genomNumber = clusters.map { it.genomeNumber }.sum()
             for (i in clusters.indices) {
                 val firstCluster = clusters[i]
                 for (j in i + 1 until clusters.size) {
                     val secondCluster = clusters[j]
-                    val newCandidate = createMergingCandidate(firstCluster, secondCluster)
+                    val newCandidate = createMergingCandidate(firstCluster, secondCluster, genomNumber)
                     if (newCandidate > currentCandidate)
                         currentCandidate = newCandidate
                 }
@@ -58,6 +61,9 @@ abstract class AbstractDistanceBasedModel : IModel {
     }
 
     override fun computeTopology(taxonList: List<Taxon>): RootedTopology {
-        error("$this can not compute topology")
+        val (cluster, branches) = computePhylogeny(taxonList)
+        val topology = cluster.topology()
+        val root = branches.last().nodes.random()
+        return topology.toRooted(root)
     }
 }

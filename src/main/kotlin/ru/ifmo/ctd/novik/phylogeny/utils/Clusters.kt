@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 import ru.ifmo.ctd.novik.phylogeny.common.*
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
+import ru.ifmo.ctd.novik.phylogeny.io.output.NewickOutputClusterVisitor
 import ru.ifmo.ctd.novik.phylogeny.io.output.Printer
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import java.util.*
@@ -11,6 +12,8 @@ fun Cluster.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(
 fun Topology.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
 fun RootedPhylogeny.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
 fun RootedTopology.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)
+
+fun RootedTopology.toNewick(): String = NewickOutputClusterVisitor().visit(this)
 
 fun Cluster.traverse(action: (Node.() -> Unit)) {
     val visited = mutableSetOf<Node>()
@@ -327,6 +330,24 @@ fun Topology.toRooted(root: TopologyNode = nodes.random(GlobalRandom)): RootedTo
     return RootedTopology(this, root)
 }
 
+fun Topology.toRooted(root: Node): RootedTopology {
+    val (edge, _) = edges.first { it.first.contains(root) }
+    return when {
+        edge.start.node === root -> toRooted(edge.start)
+        edge.end.node === root -> toRooted(edge.end)
+        else -> {
+            val topologyNode = TopologyNode(root)
+            remove(edge)
+            val i = edge.nodes.indexOf(root)
+            val firstEdge = Edge(edge.start, topologyNode, edge.nodes.subList(0, i + 1))
+            val secondEdge = Edge(topologyNode, edge.end, edge.nodes.subList(i, edge.nodes.size))
+            add(Pair(firstEdge, firstEdge.reversed()))
+            add(Pair(secondEdge, secondEdge.reversed()))
+            toRooted()
+        }
+    }
+}
+
 typealias Path = List<Node>
 
 fun createEdge(v: Node, u: Node, directed: Boolean = false) {
@@ -382,19 +403,6 @@ fun RootedTopology.checkInvariant(): Boolean {
     topology.checkInvariant()
     topology.checkInvariant(edgeList)
 
-    recombinationGroups.forEach { group ->
-        group.elements.forEach { recombination ->
-            if (checkNode(recombination.firstParent, edgeList)) {
-                error("Can't find containing edge for parent1 ${recombination.firstParent}")
-            }
-            if (checkNode(recombination.secondParent, edgeList)) {
-                error("Can't find containing edge for parent2 ${recombination.secondParent}")
-            }
-            if (checkNode(recombination.child, edgeList)) {
-                error("Can't find containing edge for child ${recombination.child}")
-            }
-        }
-    }
     return true
 }
 

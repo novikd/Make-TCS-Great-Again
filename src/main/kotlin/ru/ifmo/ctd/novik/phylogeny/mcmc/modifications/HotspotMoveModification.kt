@@ -1,11 +1,15 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
-const val HOTSPOT_DISTANCE_THRESHOLD = 0.10
+const val HOTSPOT_DISTANCE_THRESHOLD = 0.01
 
 class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
@@ -18,20 +22,19 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
         log.info { "Looking for recombination at $hotspot site" }
 
-        val computedGroups = topology.recombinationGroups.any { it.hotspot == hotspot }
-        if (!computedGroups)
-            computeRecombinationGroups(topology, hotspot)
+        val recombinationGroups = computeRecombinationGroups(topology, hotspot).filter { !it.isUsed }
 
-        val groups = topology.recombinationGroups.filter { it.hotspot == hotspot }
-        if (groups.isNotEmpty()) {
-            val group = groups.random(GlobalRandom)
+        if (recombinationGroups.isNotEmpty()) {
+            val group = recombinationGroups.random(GlobalRandom)
             applyRecombination(topology, group)
         }
         return topology
     }
 
     private fun applyRecombination(topology: RootedTopology, group: RecombinationGroup) {
-        if (group.isUsed) return
+        debug {
+            if (group.isUsed) error("Applying recombination for used group")
+        }
         val recombination = group.elements.random(GlobalRandom)
 
         log.info { "Applying recombination at ${recombination.pos} site: $recombination" }
@@ -93,7 +96,9 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
             topology.checkInvariant()
         }
 
-        group.setUsed(RecombinationGroupAmbassador(recombination, topologyNode, createdEdges, deletedPath))
+        val ambassador = RecombinationGroupAmbassador(recombination, topologyNode, createdEdges, deletedPath)
+        group.setUsed(ambassador)
+        topology.add(ambassador)
     }
 
     private fun isConsistentRecombination(child: TopologyNode, firstParent: TopologyNode, secondParent: TopologyNode) =
@@ -144,12 +149,6 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
                 log.info { "Deleting node: ${node.nodeName}" }
             }
 
-            for (group in topology.recombinationGroups) {
-                group.elements.removeIf {
-                    it.firstParent === node || it.secondParent === node || it.child === node
-                }
-            }
-            topology.recombinationGroups.removeIf { group -> group.elements.isEmpty() }
             node.neighbors.forEach { it.neighbors.remove(node) }
             node.neighbors.clear()
             topology.topology.cluster.nodes.remove(node)
@@ -210,7 +209,7 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         return ancestor
     }
 
-    private fun computeRecombinationGroups(topology: RootedTopology, hotspot: Int) {
+    private fun computeRecombinationGroups(topology: RootedTopology, hotspot: Int): List<RecombinationGroup> {
         val genomes = topology.genomes
         val length = genomes.first().second.length
 
@@ -218,6 +217,8 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
         val prefixes = Array(genomes.size) { mutableSetOf<Int>() }
         val suffixes = Array(genomes.size) { mutableSetOf<Int>() }
+
+        val distances = Array (genomes.size) { IntArray(genomes.size) }
 
         for (i in genomes.indices) {
             val iPrefix = genomes[i].second.subSequence(0, hotspot)
@@ -228,6 +229,8 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
                 val prefixDistance = hammingDistance(iPrefix, jPrefix)
                 val suffixDistance = hammingDistance(iSuffix, jSuffix)
+                distances[i][j] = prefixDistance + suffixDistance
+                distances[j][i] = prefixDistance + suffixDistance
                 if (prefixDistance < threshold && suffixDistance > threshold) {
                     prefixes[i].add(j)
                     prefixes[j].add(i)
@@ -238,20 +241,115 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
             }
         }
 
+        val groupToChildren = mutableListOf<Pair<RecombinationGroup, MutableSet<Int>>>()
         for (i in genomes.indices) {
             val iPrefixes = prefixes[i]
             val iSuffixes = suffixes[i]
 
             if (iPrefixes.isNotEmpty() && iSuffixes.isNotEmpty()) {
-                val prefix = iPrefixes.random(GlobalRandom)
-                val suffix = iSuffixes.random(GlobalRandom)
-
-                topology.add(Recombination(genomes[prefix].first, genomes[suffix].first, genomes[i].first, hotspot))
+                val (group, children) = getOrCreateRecombinationGroup(i, hotspot, groupToChildren, distances)
+                children.add(i)
+                iPrefixes.forEach { prefix ->
+                    iSuffixes.forEach { suffix ->
+                        val recombination = Recombination(
+                                genomes[prefix].first,
+                                genomes[suffix].first,
+                                genomes[i].first, hotspot, i)
+                        group.add(recombination)
+                    }
+                }
             }
+        }
+        val recombinationGroups = groupToChildren.map { it.first }
+
+        val filteredAmbassadors = topology.recombinationAmbassadors.filter { it.recombination.pos == hotspot }
+        groupToChildren.forEach { (group, children) ->
+            val groupAmbassador = filteredAmbassadors.firstOrNull { ambassador ->
+                children.any { hammingDistance(genomes[it].second, ambassador.recombination.child.genome.primary) < 10 }
+            }
+            if (groupAmbassador != null)
+                group.setUsed(groupAmbassador)
         }
 
         log.info {
-            "Recombination groups at $hotspot site: ${topology.recombinationGroups.count { it.hotspot == hotspot }}\nTotal number of recombination groups: ${topology.recombinationGroups.size}"
+            "Recombination groups at $hotspot site: ${recombinationGroups.size}"
+        }
+        return recombinationGroups
+    }
+
+    private fun getOrCreateRecombinationGroup(
+            childIndex: Int,
+            hotspot: Int,
+            groupToChildren: MutableList<Pair<RecombinationGroup, MutableSet<Int>>>,
+            distances: Array<IntArray>
+    ): Pair<RecombinationGroup, MutableSet<Int>> {
+        val group = tryGetRecombinationGroup(childIndex, hotspot, groupToChildren, distances)
+        if (group != null) {
+            return group
+        }
+
+        val newGroup = RecombinationGroup(hotspot)
+        val newChildrenSet = mutableSetOf<Int>()
+        val result = Pair(newGroup, newChildrenSet)
+        groupToChildren.add(result)
+        return result
+    }
+
+    private fun tryGetRecombinationGroup(
+            childIndex: Int,
+            hotspot: Int,
+            groupToChildren: MutableList<Pair<RecombinationGroup, MutableSet<Int>>>,
+            distances: Array<IntArray>
+    ): Pair<RecombinationGroup, MutableSet<Int>>? {
+        return runBlocking {
+            val subtasks = mutableListOf<Deferred<Pair<Boolean, Pair<RecombinationGroup, MutableSet<Int>>>>>()
+            for ((group, children) in groupToChildren)
+            {
+                subtasks.add(
+                        this.async {
+                            val iter = children.iterator()
+                            while (isActive && iter.hasNext()) {
+                                val index = iter.next()
+                                if (distances[childIndex][index] < 10)
+                                    return@async Pair(true, Pair(group, children))
+                            }
+                            return@async Pair(false, Pair(group, children))
+                        })
+            }
+            val result = subtasks.map { it.await() }.filter { it.first }
+
+            if (result.size == 1)
+                return@runBlocking result.first().second
+            if (result.isNotEmpty()) {
+                val oldSize = groupToChildren.size
+                val newElements = mutableListOf<Recombination>()
+                val newChildren = mutableSetOf<Int>()
+                result.forEach {
+                    newElements.addAll(it.second.first.elements)
+                    newChildren.addAll(it.second.second)
+                    groupToChildren.removeIf { pair -> pair.first === it.second.first }
+                }
+                val newGroup = RecombinationGroup(hotspot, newElements)
+                val resultPair = Pair(newGroup, newChildren)
+                groupToChildren.add(resultPair)
+                val newSIze = groupToChildren.size
+                log.info { "Old size: {$oldSize} New size: {$newSIze}" }
+                return@runBlocking resultPair
+            }
+
+
+//            val count = result.filter { it.first }.count()
+//            if (count != 0)
+//                log.info { "Can merge $count" }
+
+            return@runBlocking null
+//            val index = subtasks.indexOfFirst { it.await().first }
+//            if (index != -1) {
+//                for (i in index + 1..subtasks.lastIndex)
+//                    subtasks[i].cancel()
+//                return@runBlocking subtasks[index].await().second
+//            }
+//            return@runBlocking null
         }
     }
 }

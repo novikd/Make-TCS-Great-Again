@@ -22,7 +22,7 @@ open class TCSModel(
         return taxonList.map { x -> SimpleCluster(x) }.toMutableList()
     }
 
-    override fun createMergingCandidate(first: Cluster, second: Cluster): MergingCandidate {
+    override fun createMergingCandidate(first: Cluster, second: Cluster, genomNumber: Int): MergingCandidate {
         val distance = evaluate(first, second)
         return SimpleMergingCandidate(first, second, taxonDistanceEvaluator, distance)
     }
