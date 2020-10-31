@@ -122,7 +122,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
                     && suffix >= HOTSPOT_DISTANCE_THRESHOLD * GENOME_LENGTH)
                 return parents
         }
-        println("Fail")
+        println("Fail at hotspot: $hotspot")
         return null
     }
 
