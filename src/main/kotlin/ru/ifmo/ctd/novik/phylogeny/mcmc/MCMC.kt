@@ -3,14 +3,17 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.Likelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.Modification
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
-import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
-import ru.ifmo.ctd.novik.phylogeny.utils.debug
-import ru.ifmo.ctd.novik.phylogeny.utils.logger
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 import java.io.File
-import java.nio.file.Files
 import kotlin.math.ln
 import kotlin.math.min
+
+const val DUMP_LIKELIHOOD = false
+
+inline fun dump(action: () -> Unit) {
+    if (DUMP_LIKELIHOOD)
+        action()
+}
 
 class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, private val maxIterations: Int = 10_000) {
     private var iter: Int = 0
@@ -28,11 +31,11 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
         var currentLikelihood = likelihood(currentTopology)
 
         log.info { "\n******* START MCMC SIMULATION *******\nInitial likelihood: $currentLikelihood\n" }
-        debug {
+        dump {
             likelihoodDump.writeText("ITER; LIKELIHOOD\n")
         }
         while (!shouldStop()) {
-            debug {
+            dump {
                 likelihoodDump.appendText("$iter; $currentLikelihood\n")
             }
             ++iter
