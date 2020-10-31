@@ -2,9 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
-import ru.ifmo.ctd.novik.phylogeny.utils.delete
-import ru.ifmo.ctd.novik.phylogeny.utils.logger
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 class SPRModification : TreeRearrangement() {
     companion object {
@@ -16,14 +14,20 @@ class SPRModification : TreeRearrangement() {
         if (edgeWithSpot.nodes.size == 2) {
             return
         }
+        if (edgeToInsert.start in topology.recombinationEdges.flatMap { listOf(it.start, it.end) })
+            return
 
         val intermediateNodes = edgeWithSpot.nodes.subList(1, edgeWithSpot.nodes.lastIndex)
         val spotNode = intermediateNodes.random(GlobalRandom)
+        val realEdgeToInsert = getEdgeWithoutReal(edgeToInsert, topology)
 
-        log.info { "Inserting {$edgeToInsert} to edge {$edgeWithSpot} via $spotNode" }
+        log.info { "Inserting {$realEdgeToInsert} to edge {$edgeWithSpot} via $spotNode" }
 
-        edgeToInsert.delete(topology)
+        realEdgeToInsert.delete(topology)
         val topSpotNode = topology.getOrCreateNode(spotNode)
-        createNewEdge(topSpotNode, edgeToInsert.end, topology)
+        createNewEdge(topSpotNode, realEdgeToInsert.end, topology)
+        topology.mergeTwoEdges(realEdgeToInsert.start)
+        topology.mergeTwoEdges(realEdgeToInsert.end)
+        debug { topology.checkInvariant() }
     }
 }
