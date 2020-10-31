@@ -5,10 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.tree.TopologyNode
-import ru.ifmo.ctd.novik.phylogeny.utils.GlobalRandom
-import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPositions
-import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
-import ru.ifmo.ctd.novik.phylogeny.utils.genome
+import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 /**
  * @author Dmitry Novik ITMO University
@@ -60,5 +57,20 @@ abstract class TreeRearrangement : Modification {
         val revNewEdge = newEdge.reversed()
         endNode.add(revNewEdge)
         topology.topology.add(Pair(newEdge, revNewEdge))
+    }
+
+    protected fun getEdgeWithoutReal(edge: Edge, topology: RootedTopology): Edge {
+        for (i in 1 until edge.nodes.lastIndex) {
+            val node = edge.nodes[i]
+            if (node.isRealTaxon) {
+                topology.topology.remove(edge)
+                val (newNode, inEdge, revInEdge, outEdge, revOutEdge) = edge.split(node)
+                topology.topology.nodes.add(newNode)
+                topology.topology.add(Pair(inEdge, revInEdge))
+                topology.topology.add(Pair(outEdge, revOutEdge))
+                return inEdge
+            }
+        }
+        return edge
     }
 }
