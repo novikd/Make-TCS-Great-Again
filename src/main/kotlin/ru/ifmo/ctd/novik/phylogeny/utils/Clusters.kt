@@ -392,6 +392,12 @@ fun Topology.checkInvariant(edgeList: List<Edge> = edges.map { it.first }): Bool
     val value = cluster.nodes.find { node -> checkNode(node, edgeList) }
     if (value != null)
         error("Can't find containing edge for $value")
+    nodes.forEach {
+        val neighbors = it.edges.map { it.end }
+        val unique = neighbors.toSet().size
+        if (neighbors.size != unique)
+            error("Node $it has non-unique edges")
+    }
     return true
 }
 
@@ -402,6 +408,15 @@ fun RootedTopology.checkInvariant(): Boolean {
 
     topology.checkInvariant()
     topology.checkInvariant(edgeList)
+
+    recombinationAmbassadors.forEach { ambassador ->
+        if (!edgeList.any { it.contains(ambassador.recombination.firstParent) })
+            error("Can not find containing edge for parent 1: ${ambassador.recombination.firstParent}")
+        if (!edgeList.any { it.contains(ambassador.recombination.secondParent) })
+            error("Can not find containing edge for parent 1: ${ambassador.recombination.secondParent}")
+        if (!edgeList.any { it.contains(ambassador.recombination.child) })
+            error("Can not find containing edge for parent 1: ${ambassador.recombination.child}")
+    }
 
     return true
 }
