@@ -1,4 +1,4 @@
-Make TCS Great Again
+VPR_MCMC - Viral Phylogeny Reconstruction with MCMC
 =========================
 
 [![Build Status](https://travis-ci.com/novikd/Make-TCS-Great-Again.svg?branch=master)](https://travis-ci.com/novikd/Make-TCS-Great-Again)
