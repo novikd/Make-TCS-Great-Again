@@ -8,7 +8,7 @@ import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.times
 import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.*
 import ru.ifmo.ctd.novik.phylogeny.models.SubstitutionModel
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.distanceMatrix
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
 import ru.ifmo.ctd.novik.phylogeny.utils.toArrays

@@ -3,8 +3,11 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 import kotlinx.coroutines.*
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
+import ru.ifmo.ctd.novik.phylogeny.events.Recombination
+import ru.ifmo.ctd.novik.phylogeny.events.RecombinationGroup
+import ru.ifmo.ctd.novik.phylogeny.events.RecombinationGroupAmbassador
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
-import ru.ifmo.ctd.novik.phylogeny.tree.*
+import ru.ifmo.ctd.novik.phylogeny.network.*
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 import kotlin.math.min
 
@@ -361,11 +364,11 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
     }
 
     private fun getOrCreateRecombinationGroup(
-            childIndex: Int,
-            hotspot: Int,
-            groupToChildren: MutableList<Pair<RecombinationGroup, MutableSet<Int>>>,
-            distances: Array<IntArray>,
-            threshold: Double
+        childIndex: Int,
+        hotspot: Int,
+        groupToChildren: MutableList<Pair<RecombinationGroup, MutableSet<Int>>>,
+        distances: Array<IntArray>,
+        threshold: Double
     ): Pair<RecombinationGroup, MutableSet<Int>> {
         val group = tryGetRecombinationGroup(childIndex, hotspot, groupToChildren, distances, threshold)
         if (group != null) {
@@ -380,11 +383,11 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
     }
 
     private fun tryGetRecombinationGroup(
-            childIndex: Int,
-            hotspot: Int,
-            groupToChildren: MutableList<Pair<RecombinationGroup, MutableSet<Int>>>,
-            distances: Array<IntArray>,
-            threshold: Double
+        childIndex: Int,
+        hotspot: Int,
+        groupToChildren: MutableList<Pair<RecombinationGroup, MutableSet<Int>>>,
+        distances: Array<IntArray>,
+        threshold: Double
     ): Pair<RecombinationGroup, MutableSet<Int>>? {
         return runBlocking {
             val subtasks = mutableListOf<Deferred<Pair<Boolean, Pair<RecombinationGroup, MutableSet<Int>>>>>()

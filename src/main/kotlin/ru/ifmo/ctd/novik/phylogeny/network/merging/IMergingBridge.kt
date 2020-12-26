@@ -1,6 +1,6 @@
-package ru.ifmo.ctd.novik.phylogeny.tree.merging
+package ru.ifmo.ctd.novik.phylogeny.network.merging
 
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.network.Node
 
 /**
  * @author Dmitry Novik ITMO University

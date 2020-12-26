@@ -1,4 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.tree.merging
+package ru.ifmo.ctd.novik.phylogeny.network.merging
 
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
@@ -6,9 +6,9 @@ import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
-import ru.ifmo.ctd.novik.phylogeny.tree.Branch
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
+import ru.ifmo.ctd.novik.phylogeny.network.Branch
+import ru.ifmo.ctd.novik.phylogeny.network.Node
+import ru.ifmo.ctd.novik.phylogeny.network.metric.MergeMetric
 import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPositions
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.utils.genome

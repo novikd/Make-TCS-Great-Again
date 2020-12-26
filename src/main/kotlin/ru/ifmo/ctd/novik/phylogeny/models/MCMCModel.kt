@@ -9,8 +9,7 @@ import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.RecombinationLikelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.times
 import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.*
 import ru.ifmo.ctd.novik.phylogeny.tools.P_RECOMBINATION
-import ru.ifmo.ctd.novik.phylogeny.tools.RESULT_GENOMES_NUMBER
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 
 class MCMCModel(val hotspots: List<Int>, val iterations: Int = 10_000) : IModel {

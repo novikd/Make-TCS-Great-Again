@@ -1,6 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood
 
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 
 /**
  * This class represents likelihood function, which can be represented as multiplication of two likelihood terms.

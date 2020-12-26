@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
-import ru.ifmo.ctd.novik.phylogeny.tree.Edge
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.Edge
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 
 /**
  * @author Dmitry Novik ITMO University

@@ -1,4 +1,6 @@
-package ru.ifmo.ctd.novik.phylogeny.tree
+package ru.ifmo.ctd.novik.phylogeny.events
+
+import ru.ifmo.ctd.novik.phylogeny.network.Node
 
 data class Recombination(val firstParent: Node, val secondParent: Node, val child: Node, val pos: Int, val childIndex: Int) {
     override fun toString(): String {

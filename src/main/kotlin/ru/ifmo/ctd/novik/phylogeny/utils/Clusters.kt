@@ -6,7 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
 import ru.ifmo.ctd.novik.phylogeny.io.output.NewickOutputClusterVisitor
 import ru.ifmo.ctd.novik.phylogeny.io.output.Printer
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
-import ru.ifmo.ctd.novik.phylogeny.tree.*
+import ru.ifmo.ctd.novik.phylogeny.network.*
 import java.util.*
 
 fun Cluster.toGraphviz(printer: Printer): String = GraphvizOutputClusterVisitor(printer).visit(this)

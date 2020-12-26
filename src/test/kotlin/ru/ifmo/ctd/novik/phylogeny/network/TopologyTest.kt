@@ -1,4 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.tree
+package ru.ifmo.ctd.novik.phylogeny.network
 
 import org.junit.jupiter.api.Test
 import ru.ifmo.ctd.novik.phylogeny.base.AbstractTestWithOutputFile

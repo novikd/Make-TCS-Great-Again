@@ -1,4 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.tree
+package ru.ifmo.ctd.novik.phylogeny.events
 
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -8,9 +8,9 @@ import ru.ifmo.ctd.novik.phylogeny.utils.genome
 import java.lang.Integer.min
 
 data class RecombinationGroup(
-        val hotspot: Int,
-        val elements: MutableList<Recombination> = mutableListOf(),
-        var isUsed: Boolean = false
+    val hotspot: Int,
+    val elements: MutableList<Recombination> = mutableListOf(),
+    var isUsed: Boolean = false
 ) {
     var ambassador: RecombinationGroupAmbassador? = null
 

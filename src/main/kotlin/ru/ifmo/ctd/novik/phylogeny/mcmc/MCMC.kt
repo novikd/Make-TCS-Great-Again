@@ -3,7 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.Likelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.Modification
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
 import ru.ifmo.ctd.novik.phylogeny.utils.createCSVLogger
 import ru.ifmo.ctd.novik.phylogeny.utils.debug

@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.distance.cluster
 
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistance
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.network.Node
 
 /**
  * @author Dmitry Novik ITMO University

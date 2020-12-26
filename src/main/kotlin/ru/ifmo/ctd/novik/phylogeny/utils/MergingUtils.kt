@@ -2,9 +2,9 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.*
-import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
+import ru.ifmo.ctd.novik.phylogeny.network.Node
+import ru.ifmo.ctd.novik.phylogeny.network.merging.*
+import ru.ifmo.ctd.novik.phylogeny.network.metric.MergeMetric
 
 internal const val BRUTE_FORCE_DISTANCE_THRESHOLD = 11
 

@@ -1,4 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.tree.merging
+package ru.ifmo.ctd.novik.phylogeny.network.merging
 
 import ru.ifmo.ctd.novik.phylogeny.utils.Path
 

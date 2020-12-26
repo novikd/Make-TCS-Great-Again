@@ -1,10 +1,9 @@
-package ru.ifmo.ctd.novik.phylogeny.tree.metric
+package ru.ifmo.ctd.novik.phylogeny.network.metric
 
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingMetaData
+import ru.ifmo.ctd.novik.phylogeny.network.Node
+import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingMetaData
 import ru.ifmo.ctd.novik.phylogeny.utils.computeGraphDistances
-import java.util.*
 
 /**
  * @author Novik Dmitry ITMO University

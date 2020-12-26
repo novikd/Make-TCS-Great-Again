@@ -2,9 +2,9 @@ package ru.ifmo.ctd.novik.phylogeny.io.output
 
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.RootedPhylogeny
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.tree.Topology
-import ru.ifmo.ctd.novik.phylogeny.tree.TopologyNode
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.Topology
+import ru.ifmo.ctd.novik.phylogeny.network.TopologyNode
 
 /**
  * @author Dmitry Novik ITMO University

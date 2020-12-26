@@ -1,4 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.tree
+package ru.ifmo.ctd.novik.phylogeny.network
 
 data class TopologyCloneResult(
         val topology: Topology,

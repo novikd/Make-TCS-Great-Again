@@ -4,9 +4,9 @@ import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistanceEvaluator
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingResult
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.SimpleMergingCandidate
+import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingCandidate
+import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingResult
+import ru.ifmo.ctd.novik.phylogeny.network.merging.SimpleMergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
 
 /**

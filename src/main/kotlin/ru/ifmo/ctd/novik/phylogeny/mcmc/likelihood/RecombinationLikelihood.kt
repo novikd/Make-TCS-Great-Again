@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood
 
 import ru.ifmo.ctd.novik.phylogeny.models.SubstitutionModel
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.LnPoissonProbabilityMassFunction
 import ru.ifmo.ctd.novik.phylogeny.utils.debug
 import ru.ifmo.ctd.novik.phylogeny.utils.logger

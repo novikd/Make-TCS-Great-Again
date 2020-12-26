@@ -2,10 +2,10 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
-import ru.ifmo.ctd.novik.phylogeny.tree.Edge
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.tree.TopologyNode
+import ru.ifmo.ctd.novik.phylogeny.network.Edge
+import ru.ifmo.ctd.novik.phylogeny.network.Node
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.TopologyNode
 import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPositions
 import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
 import ru.ifmo.ctd.novik.phylogeny.utils.genome

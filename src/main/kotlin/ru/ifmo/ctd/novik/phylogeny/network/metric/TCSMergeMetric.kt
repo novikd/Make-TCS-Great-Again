@@ -1,4 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.tree.metric
+package ru.ifmo.ctd.novik.phylogeny.network.metric
 
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 

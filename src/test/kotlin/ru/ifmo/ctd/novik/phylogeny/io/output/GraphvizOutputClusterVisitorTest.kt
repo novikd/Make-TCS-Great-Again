@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
-import ru.ifmo.ctd.novik.phylogeny.tree.Node
+import ru.ifmo.ctd.novik.phylogeny.network.Node
 import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
 
 internal class GraphvizOutputClusterVisitorTest {

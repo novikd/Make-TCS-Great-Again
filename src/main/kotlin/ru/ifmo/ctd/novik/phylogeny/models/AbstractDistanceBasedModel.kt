@@ -3,10 +3,10 @@ package ru.ifmo.ctd.novik.phylogeny.models
 import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.Phylogeny
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
-import ru.ifmo.ctd.novik.phylogeny.tree.Branch
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingCandidate
-import ru.ifmo.ctd.novik.phylogeny.tree.merging.MergingResult
+import ru.ifmo.ctd.novik.phylogeny.network.Branch
+import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingCandidate
+import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingResult
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
 import ru.ifmo.ctd.novik.phylogeny.utils.toRooted
 import ru.ifmo.ctd.novik.phylogeny.utils.topology
