@@ -1,14 +1,10 @@
 package ru.ifmo.ctd.novik.phylogeny.tools
 
-import ru.ifmo.ctd.novik.phylogeny.common.Genome
+import ru.ifmo.ctd.novik.phylogeny.common.ConstantGenome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.io.input.FastaInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.utils.ConfigurationDelegate
-import ru.ifmo.ctd.novik.phylogeny.utils.PhylogeneticModel
-import ru.ifmo.ctd.novik.phylogeny.utils.create
-import ru.ifmo.ctd.novik.phylogeny.utils.toNewick
 import java.io.File
-import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -69,18 +65,18 @@ fun main(args: Array<String>) {
 
             if (multiple.isEmpty()) {
                 val subTaxonList = unique.mapIndexed { index, (name, seq) ->
-                    Taxon(index, name, Genome(seq))
+                    Taxon(index, name, ConstantGenome(seq))
                 }
                 zipOut.putNextEntry(ZipEntry("sequences${iter++}.nex"))
                 zipOut.write(subTaxonList.toNexus().toByteArray())
             } else {
                 while (multiple[0].size != indices[0]) {
                     val subTaxonList = unique.mapIndexed { index, (name, seq) ->
-                        Taxon(index, name, Genome(seq))
+                        Taxon(index, name, ConstantGenome(seq))
                     } + multiple.mapIndexed { index, list ->
                         list[indices[index]]
                     }.mapIndexed { index, (name, seq) ->
-                        Taxon(unique.size + index, name, Genome(seq))
+                        Taxon(unique.size + index, name, ConstantGenome(seq))
                     }
 
                     zipOut.putNextEntry(ZipEntry("sequences$iter.nex"))

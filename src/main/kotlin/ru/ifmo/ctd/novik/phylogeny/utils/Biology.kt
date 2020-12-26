@@ -6,9 +6,9 @@ import ru.ifmo.ctd.novik.phylogeny.common.*
  * @author Dmitry Novik ITMO University
  */
 
-fun String.toGenome(): Genome = Genome(this)
+fun String.toGenome(): Genome = ConstantGenome(this)
 
-fun String.toMutableGenome(): MutableGenome = MutableGenome(this)
+fun String.toMutableGenome(): MutableGenome = GenomeWithOptionSet(this)
 
 internal var taxonGenerator = generateSequence (Taxon(0)) { Taxon(it.id + 1) }.iterator()
 
@@ -28,7 +28,7 @@ fun computeDistinctPositions(firstTaxon: Taxon, secondTaxon: Taxon): List<Int> {
     return computeDistinctPositions(firstGenome, secondGenome)
 }
 
-fun computeDifference(firstGenome: IGenome, secondGenome: IGenome): Set<Pair<Int, Char>> {
+fun computeDifference(firstGenome: Genome, secondGenome: Genome): Set<Pair<Int, Char>> {
     val result = mutableSetOf<Pair<Int, Char>>()
     for (i in firstGenome.primary.indices) {
         if (firstGenome.primary[i] != secondGenome.primary[i])

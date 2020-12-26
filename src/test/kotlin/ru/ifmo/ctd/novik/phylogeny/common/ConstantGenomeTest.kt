@@ -9,7 +9,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toMutableGenome
 /**
  * @author Dmitry Novik ITMO University
  */
-internal class GenomeTest {
+internal class ConstantGenomeTest {
 
     @Test
     fun isReal() {

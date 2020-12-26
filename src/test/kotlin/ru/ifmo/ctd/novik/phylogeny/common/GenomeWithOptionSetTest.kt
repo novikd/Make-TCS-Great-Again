@@ -8,7 +8,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toMutableGenome
 /**
  * @author Dmitry Novik ITMO University
  */
-internal class MutableGenomeTest {
+internal class GenomeWithOptionSetTest {
 
     @Test
     fun getGenomeOptions() {
@@ -31,7 +31,7 @@ internal class MutableGenomeTest {
 
     @Test
     fun process() {
-        val genome = MutableGenome()
+        val genome = GenomeWithOptionSet()
         genome.addAll(listOf("AT", "TC", "GT", "AC"))
 
         val set = mutableSetOf<String>()

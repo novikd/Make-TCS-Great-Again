@@ -357,10 +357,10 @@ fun createEdge(v: Node, u: Node, directed: Boolean = false) {
         u.connect(v)
 }
 
-val Node.genome: IGenome
+val Node.genome: Genome
     get() = taxon.genome
 
-val TopologyNode.genome: IGenome
+val TopologyNode.genome: Genome
     get() = node.genome
 
 fun Node.computeGraphDistances(): Map<Node, Int> {
