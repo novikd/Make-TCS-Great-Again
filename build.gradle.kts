@@ -1,6 +1,6 @@
 import org.kt3k.gradle.plugin.CoverallsPluginExtension
 
-group = "Make-TCS-Great-Again"
+group = "VPR_MCMC"
 version = "0.1"
 
 plugins {

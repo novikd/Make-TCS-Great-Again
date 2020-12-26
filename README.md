@@ -1,8 +1,8 @@
 VPR_MCMC - Viral Phylogeny Reconstruction with MCMC
 =========================
 
-[![Build Status](https://travis-ci.com/novikd/Make-TCS-Great-Again.svg?branch=master)](https://travis-ci.com/novikd/Make-TCS-Great-Again)
-[![Coverage Status](https://coveralls.io/repos/github/novikd/Make-TCS-Great-Again/badge.svg?branch=master)](https://coveralls.io/github/novikd/Make-TCS-Great-Again?branch=master)
+[![Build Status](https://travis-ci.com/novikd/VPR_MCMC.svg?branch=master)](https://travis-ci.com/novikd/VPR_MCMC)
+[![Coverage Status](https://coveralls.io/repos/github/novikd/VPR_MCMC/badge.svg?branch=master)](https://coveralls.io/github/novikd/VPR_MCMC?branch=master)
 
 Kotlin implementation of TCS algorithm.
 Implemented as a baseline solution for future expansion of the underlying approach. 

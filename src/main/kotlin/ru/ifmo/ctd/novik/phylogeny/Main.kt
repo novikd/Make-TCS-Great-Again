@@ -14,7 +14,7 @@ import java.io.File
  * @author Novik Dmitry ITMO University
  */
 fun main(args: Array<String>) {
-    val parser = ArgParser("Make-TCS-Great-Again")
+    val parser = ArgParser("VPR_MCMC")
     val phylogeneticModel by parser.option(
             ModelChoice,
             shortName = "m",
