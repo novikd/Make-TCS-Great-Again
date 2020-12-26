@@ -2,22 +2,18 @@ package ru.ifmo.ctd.novik.phylogeny.utils
 
 import kotlinx.cli.ArgType
 import ru.ifmo.ctd.novik.phylogeny.common.Phylogeny
-import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.AbsoluteClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.AbsoluteTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.PrimaryTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.toCaching
-import ru.ifmo.ctd.novik.phylogeny.io.input.FastaInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.io.input.SimpleInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.models.*
-import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import java.util.logging.Logger
 
-var DEBUG_ENABLED = false
-
 inline fun debug(action: () -> Unit) {
-    if (DEBUG_ENABLED)
+    if (GlobalExecutionSettings.DEBUG_ENABLED)
         action()
 }
 

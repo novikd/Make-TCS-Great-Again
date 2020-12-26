@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.*
@@ -10,7 +11,7 @@ class SPRModification : TreeRearrangement() {
     }
 
     override fun apply(startEdge: Edge, endEdge: Edge, topology: RootedTopology) {
-        val (edgeToInsert, edgeWithSpot) = listOf(startEdge, endEdge).shuffled(GlobalRandom)
+        val (edgeToInsert, edgeWithSpot) = listOf(startEdge, endEdge).shuffled(GlobalExecutionSettings.RANDOM)
         if (edgeWithSpot.nodes.size == 2) {
             return
         }
@@ -18,7 +19,7 @@ class SPRModification : TreeRearrangement() {
             return
 
         val intermediateNodes = edgeWithSpot.nodes.subList(1, edgeWithSpot.nodes.lastIndex)
-        val spotNode = intermediateNodes.random(GlobalRandom)
+        val spotNode = intermediateNodes.random(GlobalExecutionSettings.RANDOM)
         val realEdgeToInsert = getEdgeWithoutReal(edgeToInsert, topology)
 
         log.info { "Inserting {$realEdgeToInsert} to edge {$edgeWithSpot} via $spotNode" }

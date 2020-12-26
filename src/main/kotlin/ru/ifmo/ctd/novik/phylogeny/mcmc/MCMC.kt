@@ -2,25 +2,22 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc
 
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.Likelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.modifications.Modification
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
-import ru.ifmo.ctd.novik.phylogeny.utils.*
-import java.io.File
+import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
+import ru.ifmo.ctd.novik.phylogeny.utils.createCSVLogger
+import ru.ifmo.ctd.novik.phylogeny.utils.debug
+import ru.ifmo.ctd.novik.phylogeny.utils.logger
 import kotlin.math.ln
 import kotlin.math.min
 
-const val DUMP_LIKELIHOOD = false
-
-inline fun dump(action: () -> Unit) {
-    if (DUMP_LIKELIHOOD)
-        action()
-}
+internal const val LIKELIHOOD_DUMP_FILE = "likelihood_dump.csv"
 
 class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, private val maxIterations: Int = 10_000) {
     private var iter: Int = 0
 
     companion object {
         val log = logger()
-        val likelihoodDump = File("likelihood_dump.csv")
     }
 
     private fun shouldStop(): Boolean = iter == maxIterations
@@ -31,35 +28,35 @@ class MCMC(val likelihood: Likelihood, val modifications: List<Modification>, pr
         var currentLikelihood = likelihood(currentTopology)
 
         log.info { "\n******* START MCMC SIMULATION *******\nInitial likelihood: $currentLikelihood\n" }
-        dump {
-            likelihoodDump.writeText("ITER; LIKELIHOOD\n")
-        }
-        while (!shouldStop()) {
-            dump {
-                likelihoodDump.appendText("$iter; $currentLikelihood\n")
-            }
-            ++iter
-            val modification = modifications.random(GlobalRandom)
-            val newTopology = modification(currentTopology.clone())
-            val newLikelihood = likelihood(newTopology)
 
-            val lnYX = min(newLikelihood - currentLikelihood, 0.0)
+        createCSVLogger(LIKELIHOOD_DUMP_FILE, GlobalExecutionSettings.DUMP_LIKELIHOOD).use { likelihoodDump ->
+            likelihoodDump.log("ITER", "LIKELIHOOD")
+            while (!shouldStop()) {
+                likelihoodDump.log(iter, currentLikelihood)
+                ++iter
+                val modification = modifications.random(GlobalExecutionSettings.RANDOM)
+                val newTopology = modification(currentTopology.clone())
+                val newLikelihood = likelihood(newTopology)
 
-            if (newLikelihood > currentLikelihood || ln(GlobalRandom.nextDouble()) < lnYX) {
-                log.info {
-                    "Accepted $modification\nPrevious likelihood: $currentLikelihood\nNew likelihood: $newLikelihood"
+                val lnYX = min(newLikelihood - currentLikelihood, 0.0)
+
+                if (newLikelihood > currentLikelihood || ln(GlobalExecutionSettings.RANDOM.nextDouble()) < lnYX) {
+                    log.fine {
+                        "Accepted $modification\nPrevious likelihood: $currentLikelihood\nNew likelihood: $newLikelihood"
+                    }
+                    currentTopology = newTopology
+                    currentLikelihood = newLikelihood
+                    debug {
+                        log.fine { "Invariant after modification: ${currentTopology.checkInvariant()}" }
+                    }
                 }
-                currentTopology = newTopology
-                currentLikelihood = newLikelihood
-                debug {
-                    log.info { "Invariant after modification: ${currentTopology.checkInvariant()}" }
+
+                if (iter % 100 == 0) {
+                    log.info { "Processed $iter iterations. Current likelihood value: $currentLikelihood" }
                 }
             }
-
-            if (iter % 100 == 0) {
-                log.info { "Processed $iter iterations. Current likelihood value: $currentLikelihood" }
-            }
         }
+
         return currentTopology
     }
 }

@@ -1,10 +1,9 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.random.Random
-
-var GlobalRandom = Random(0)
 
 class LnPoissonProbabilityMassFunction(private val lambda: Double) {
     operator fun invoke(k: Int): Double = -lambda + k * ln(lambda) +
@@ -13,7 +12,7 @@ class LnPoissonProbabilityMassFunction(private val lambda: Double) {
                     .map { -ln(it.toDouble()) }.sum()
 }
 
-class PoissonRandomVariable(val lambda: Double, val random: Random = GlobalRandom) {
+class PoissonRandomVariable(val lambda: Double, val random: Random = GlobalExecutionSettings.RANDOM) {
     fun next(): Int {
         var k = 0
         var p = 1.0

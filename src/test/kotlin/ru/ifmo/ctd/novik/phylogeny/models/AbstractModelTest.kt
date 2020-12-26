@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import ru.ifmo.ctd.novik.phylogeny.base.AbstractTestWithOutputFile
 import ru.ifmo.ctd.novik.phylogeny.io.output.VerbosePrinter
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 import kotlin.random.Random
 
@@ -15,7 +16,7 @@ abstract class AbstractModelTest : AbstractTestWithOutputFile() {
 
     companion object {
         @BeforeAll @JvmStatic fun setUp() {
-            GlobalRandom = Random(0)
+            GlobalExecutionSettings.RANDOM = Random(0)
         }
     }
 

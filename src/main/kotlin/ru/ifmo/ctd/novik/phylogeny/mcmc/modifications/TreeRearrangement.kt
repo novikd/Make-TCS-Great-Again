@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
@@ -20,13 +21,13 @@ abstract class TreeRearrangement : Modification {
         }
 
         if (filteredEdges.isNotEmpty()) {
-            val edge = filteredEdges.random(GlobalRandom)
+            val edge = filteredEdges.random(GlobalExecutionSettings.RANDOM)
 
             val startNode = edge.start
             val endNode = edge.end
 
-            val startEdge = startNode.next.filterNot { it === edge || it in recombinationEdges }.random(GlobalRandom)
-            val endEdge = endNode.next.filterNot { it in recombinationEdges }.random(GlobalRandom)
+            val startEdge = startNode.next.filterNot { it === edge || it in recombinationEdges }.random(GlobalExecutionSettings.RANDOM)
+            val endEdge = endNode.next.filterNot { it in recombinationEdges }.random(GlobalExecutionSettings.RANDOM)
 
             apply(startEdge, endEdge, topology)
         }

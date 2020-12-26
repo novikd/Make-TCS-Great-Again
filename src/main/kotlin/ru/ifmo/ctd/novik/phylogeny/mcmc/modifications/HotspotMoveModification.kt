@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 import kotlinx.coroutines.*
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 import kotlin.math.min
@@ -16,14 +17,14 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
     }
 
     override fun invoke(topology: RootedTopology): RootedTopology {
-        val hotspot = hotspots.random(GlobalRandom)
+        val hotspot = hotspots.random(GlobalExecutionSettings.RANDOM)
 
         log.info { "Looking for recombination at $hotspot site" }
 
         val recombinationGroups = computeRecombinationGroups(topology, hotspot).filter { !it.isUsed }
 
         if (recombinationGroups.isNotEmpty()) {
-            val group = recombinationGroups.random(GlobalRandom)
+            val group = recombinationGroups.random(GlobalExecutionSettings.RANDOM)
             applyRecombination(topology, group)
         }
         return topology
@@ -33,7 +34,7 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
         debug {
             if (group.isUsed) error("Applying recombination for used group")
         }
-        val recombination = group.elements.random(GlobalRandom)
+        val recombination = group.elements.random(GlobalExecutionSettings.RANDOM)
 
         log.info { "Applying recombination at ${recombination.pos} site: $recombination" }
 
@@ -302,8 +303,8 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
 
                 prefixGroups.forEach { prefix ->
                     suffixGroups.forEach { suffix ->
-                        val prefixIndex = prefix.genomes.random(GlobalRandom)
-                        val suffixIndex = suffix.genomes.random(GlobalRandom)
+                        val prefixIndex = prefix.genomes.random(GlobalExecutionSettings.RANDOM)
+                        val suffixIndex = suffix.genomes.random(GlobalExecutionSettings.RANDOM)
                         val recombination = Recombination(
                                 genomes[prefixIndex].first,
                                 genomes[suffixIndex].first,

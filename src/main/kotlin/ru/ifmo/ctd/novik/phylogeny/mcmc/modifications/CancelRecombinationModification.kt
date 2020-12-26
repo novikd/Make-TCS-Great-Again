@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.Edge
 import ru.ifmo.ctd.novik.phylogeny.tree.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.utils.*
@@ -13,7 +14,7 @@ class CancelRecombinationModification : Modification {
     override fun invoke(topology: RootedTopology): RootedTopology {
         if (topology.recombinationAmbassadors.isEmpty()) return topology
 
-        val ambassador = topology.recombinationAmbassadors.random(GlobalRandom)
+        val ambassador = topology.recombinationAmbassadors.random(GlobalExecutionSettings.RANDOM)
         val (recombination, midNode, _, path) = ambassador
 
         if (path.first() !in topology.topology.cluster || path.last() !in topology.topology.cluster)

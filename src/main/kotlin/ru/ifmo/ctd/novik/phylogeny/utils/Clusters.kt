@@ -5,6 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.io.output.GraphvizOutputClusterVisitor
 import ru.ifmo.ctd.novik.phylogeny.io.output.NewickOutputClusterVisitor
 import ru.ifmo.ctd.novik.phylogeny.io.output.Printer
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.*
 import java.util.*
 
@@ -144,7 +145,7 @@ fun Cluster.label(): Cluster {
 
         genome.add(buildString(length) {
             array.forEach { set ->
-                this.append(set.random(GlobalRandom))
+                this.append(set.random(GlobalExecutionSettings.RANDOM))
             }
         })
     }
@@ -158,7 +159,7 @@ fun Cluster.label(): Cluster {
             val genome = neighbor.genome as MutableGenome
             genome.add(buildString(length) {
                 nodeGenome.forEachIndexed { index, c ->
-                    this.append(if (c in array[index]) c else array[index].random(GlobalRandom)) // TODO: it works not so well
+                    this.append(if (c in array[index]) c else array[index].random(GlobalExecutionSettings.RANDOM)) // TODO: it works not so well
                 }
             })
 
@@ -206,7 +207,7 @@ fun DistanceMatrix.print(): String {
 }
 
 fun Phylogeny.directed(): RootedPhylogeny {
-    val root = branches.last().nodes.random(GlobalRandom)
+    val root = branches.last().nodes.random(GlobalExecutionSettings.RANDOM)
 
     val queue = ArrayDeque<Node>()
     val visited = mutableSetOf<Node>()
@@ -271,7 +272,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
 
             genome.add(buildString(length) {
                 array.forEach { set ->
-                    this.append(set.random(GlobalRandom))
+                    this.append(set.random(GlobalExecutionSettings.RANDOM))
                 }
             })
         }
@@ -295,7 +296,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
                                 if (nodeGenome[index] in set)
                                     append(nodeGenome[index])
                                 else
-                                    append(set.random(GlobalRandom))
+                                    append(set.random(GlobalExecutionSettings.RANDOM))
                             }
                         })
                     }
@@ -307,7 +308,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
     return this
 }
 
-fun Topology.toRooted(root: TopologyNode = nodes.random(GlobalRandom)): RootedTopology {
+fun Topology.toRooted(root: TopologyNode = nodes.random(GlobalExecutionSettings.RANDOM)): RootedTopology {
     val queue = ArrayDeque<Pair<TopologyNode, TopologyNode>>()
     val visited = mutableSetOf<TopologyNode>()
     queue.add(Pair(root, root))

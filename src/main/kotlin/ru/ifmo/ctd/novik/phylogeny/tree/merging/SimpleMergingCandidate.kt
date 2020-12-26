@@ -4,6 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.tree.Branch
 import ru.ifmo.ctd.novik.phylogeny.tree.Node
 import ru.ifmo.ctd.novik.phylogeny.tree.metric.MergeMetric
@@ -29,7 +30,7 @@ open class SimpleMergingCandidate(
     override fun merge(): MergingResult {
         val pairs = distance.minimumPoints
 
-        val (first, second) = pairs.random(GlobalRandom)
+        val (first, second) = pairs.random(GlobalExecutionSettings.RANDOM)
 
         val firstNodes = first.adjacentIntermediateNodes
         val secondNodes = second.adjacentIntermediateNodes

@@ -9,6 +9,8 @@ import ru.ifmo.ctd.novik.phylogeny.io.input.SimpleInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.io.output.PrettyPrinter
 import ru.ifmo.ctd.novik.phylogeny.utils.*
 import java.io.File
+import java.util.logging.Level
+import java.util.logging.LogManager
 
 /**
  * @author Novik Dmitry ITMO University
@@ -24,6 +26,7 @@ fun main(args: Array<String>) {
     val output by parser.option(ArgType.String, shortName = "c", description = "Computed output").default("phylogeny")
 
     parser.parse(args)
+//    setDebugLogLevel()
 
     val hotspots by ConfigurationDelegate()
 
@@ -60,4 +63,10 @@ fun main(args: Array<String>) {
     }
     val endTime = System.currentTimeMillis()
     println("Total time: ${(endTime - startTime) / 1_000} sec")
+}
+
+fun setDebugLogLevel() {
+    val rootLogger = LogManager.getLogManager().getLogger("")
+    rootLogger.level = Level.ALL
+    rootLogger.handlers.forEach { it.level = Level.ALL }
 }
