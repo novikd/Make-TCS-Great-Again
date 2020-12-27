@@ -3,38 +3,15 @@ package ru.ifmo.ctd.novik.phylogeny.tools
 import ru.ifmo.ctd.novik.phylogeny.common.Genome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.io.input.FastaInputTaxaReader
+import ru.ifmo.ctd.novik.phylogeny.io.output.toNexus
 import ru.ifmo.ctd.novik.phylogeny.utils.ConfigurationDelegate
-import ru.ifmo.ctd.novik.phylogeny.utils.PhylogeneticModel
-import ru.ifmo.ctd.novik.phylogeny.utils.create
-import ru.ifmo.ctd.novik.phylogeny.utils.toNewick
 import java.io.File
-import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 /**
  * @author Dmitry Novik ITMO University
  */
-
-fun List<Taxon>.toNexus(): String {
-    return buildString {
-        appendln("#NEXUS")
-
-        appendln("begin data;")
-        appendln("dimensions ntax=${this@toNexus.size} nchar=${this@toNexus.first().genome.primary.length};")
-        appendln("format datatype=dna gap=-;")
-        appendln("matrix")
-        appendln(this@toNexus.joinToString(separator = "\n") { "${it.name} ${it.genome.primary}" })
-        appendln(";")
-        appendln("end;")
-
-        appendln("begin mrbayes;")
-        appendln("set autoclose=yes nowarn=yes;")
-        appendln("mcmc nruns=1 ngen=10000 samplefreq=10;")
-        appendln("sumt;")
-        appendln("end;")
-    }
-}
 
 fun main(args: Array<String>) {
     var taxonList = FastaInputTaxaReader().readFile(args.last()).map { Pair(it.name, it.genome.primary) }

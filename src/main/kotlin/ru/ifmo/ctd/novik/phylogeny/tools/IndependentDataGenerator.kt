@@ -3,6 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.tools
 import ru.ifmo.ctd.novik.phylogeny.common.*
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.io.output.PrettyPrinter
+import ru.ifmo.ctd.novik.phylogeny.io.output.toNexus
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.BranchLikelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.RecombinationLikelihood
 import ru.ifmo.ctd.novik.phylogeny.mcmc.likelihood.times
@@ -16,11 +17,11 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.random.Random
 
-private val LOCAL_RANDOM = Random(1234758)
+private val LOCAL_RANDOM = Random(43021)
 
 const val P_RECOMBINATION = 0.10
 
-const val RESULT_GENOMES_NUMBER = 30
+const val RESULT_GENOMES_NUMBER = 10
 
 const val GENOME_LENGTH = 1000
 
@@ -28,7 +29,8 @@ val outputDirectory = File("simulated")
 val recombinationOutputFile = File("simulated/recombination.txt")
 val graphvizOutputFile = File("simulated/graphviz.dot")
 val distancesOutputFile = File("simulated/distances.txt")
-val sequencesOutputFile = File("simulated/sequences.fas")
+val fastaSequencesOutputFile = File("simulated/sequences.fas")
+val nexusSequencesOutputFile = File("simulated/sequences.nexus")
 
 class IndependentDataGenerator(val output: Boolean = true) {
     private var id = 0
@@ -62,7 +64,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
         while (currentLeafs.size < RESULT_GENOMES_NUMBER) {
             val isRecombination = currentLeafs.size > 1 && LOCAL_RANDOM.nextDouble() <= P_RECOMBINATION
             println(isRecombination)
-            if (isRecombination) {
+            if (isRecombination && false) {
                 val hotspot = hotspots.random(LOCAL_RANDOM)
 
                 val parents = findRecombinantParent(currentLeafs, hotspot) ?: continue
@@ -310,7 +312,8 @@ fun main() {
         resultMatrix[map.key] = map.value.filter { a -> generator.leafs.any { it.node === a.key } }
     }
     distancesOutputFile.writeText(resultMatrix.print())
-    sequencesOutputFile.writeText(generator.leafs.joinToString(separator = "\n") { ">${it.node}\n${it.genome.primary}" })
+    fastaSequencesOutputFile.writeText(generator.leafs.joinToString(separator = "\n") { ">${it.node}\n${it.genome.primary}" })
+    nexusSequencesOutputFile.writeText(generator.leafs.map { it.node.taxon }.toNexus())
 
     println(cluster.toList().size)
     println(cluster.distinct().size)
