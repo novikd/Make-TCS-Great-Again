@@ -15,21 +15,21 @@ import java.util.zip.ZipOutputStream
 
 fun List<Taxon>.toNexus(): String {
     return buildString {
-        appendln("#NEXUS")
+        appendLine("#NEXUS")
 
-        appendln("begin data;")
-        appendln("dimensions ntax=${this@toNexus.size} nchar=${this@toNexus.first().genome.primary.length};")
-        appendln("format datatype=dna gap=-;")
-        appendln("matrix")
-        appendln(this@toNexus.joinToString(separator = "\n") { "${it.name} ${it.genome.primary}" })
-        appendln(";")
-        appendln("end;")
+        appendLine("begin data;")
+        appendLine("dimensions ntax=${this@toNexus.size} nchar=${this@toNexus.first().genome.primary.length};")
+        appendLine("format datatype=dna gap=-;")
+        appendLine("matrix")
+        appendLine(this@toNexus.joinToString(separator = "\n") { "${it.name} ${it.genome.primary}" })
+        appendLine(";")
+        appendLine("end;")
 
-        appendln("begin mrbayes;")
-        appendln("set autoclose=yes nowarn=yes;")
-        appendln("mcmc nruns=1 ngen=10000 samplefreq=10;")
-        appendln("sumt;")
-        appendln("end;")
+        appendLine("begin mrbayes;")
+        appendLine("set autoclose=yes nowarn=yes;")
+        appendLine("mcmc nruns=1 ngen=10000 samplefreq=10;")
+        appendLine("sumt;")
+        appendLine("end;")
     }
 }
 
