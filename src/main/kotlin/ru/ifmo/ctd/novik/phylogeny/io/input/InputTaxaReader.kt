@@ -1,10 +1,10 @@
 package ru.ifmo.ctd.novik.phylogeny.io.input
 
-import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.common.ObservedTaxon
 
 /**
  * @author Dmitry ITMO University
  */
 interface InputTaxaReader {
-    fun readFile(filename: String): List<Taxon>
+    fun readFile(filename: String): List<ObservedTaxon>
 }

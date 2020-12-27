@@ -10,9 +10,9 @@ fun String.toGenome(): Genome = ConstantGenome(this)
 
 fun String.toMutableGenome(): MutableGenome = GenomeWithOptionSet(this)
 
-internal var taxonGenerator = generateSequence (Taxon(0)) { Taxon(it.id + 1) }.iterator()
+internal var taxonGenerator = generateSequence(ReconstructedTaxon(0)) { ReconstructedTaxon(it.id + 1) }.iterator()
 
-fun createTaxon(): Taxon = taxonGenerator.next()
+fun createTaxon(): ReconstructedTaxon = taxonGenerator.next()
 
 fun computeDistinctPositions(lhs: String, rhs: String): List<Int> {
     val positions = mutableListOf<Int>()

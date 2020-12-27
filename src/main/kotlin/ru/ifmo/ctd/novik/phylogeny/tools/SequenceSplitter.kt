@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.tools
 
 import ru.ifmo.ctd.novik.phylogeny.common.ConstantGenome
+import ru.ifmo.ctd.novik.phylogeny.common.ObservedTaxon
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.io.input.FastaInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.utils.ConfigurationDelegate
@@ -65,18 +66,18 @@ fun main(args: Array<String>) {
 
             if (multiple.isEmpty()) {
                 val subTaxonList = unique.mapIndexed { index, (name, seq) ->
-                    Taxon(index, name, ConstantGenome(seq))
+                    ObservedTaxon(index, name, ConstantGenome(seq))
                 }
                 zipOut.putNextEntry(ZipEntry("sequences${iter++}.nex"))
                 zipOut.write(subTaxonList.toNexus().toByteArray())
             } else {
                 while (multiple[0].size != indices[0]) {
                     val subTaxonList = unique.mapIndexed { index, (name, seq) ->
-                        Taxon(index, name, ConstantGenome(seq))
+                        ObservedTaxon(index, name, ConstantGenome(seq))
                     } + multiple.mapIndexed { index, list ->
                         list[indices[index]]
                     }.mapIndexed { index, (name, seq) ->
-                        Taxon(unique.size + index, name, ConstantGenome(seq))
+                        ObservedTaxon(unique.size + index, name, ConstantGenome(seq))
                     }
 
                     zipOut.putNextEntry(ZipEntry("sequences$iter.nex"))

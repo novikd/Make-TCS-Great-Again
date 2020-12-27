@@ -1,8 +1,14 @@
 package ru.ifmo.ctd.novik.phylogeny.common
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
-data class Taxon(val id: Int, val name: String = "intermediate$id", val genome: Genome = GenomeWithOptionSet()) {
-    fun contains(genome: Genome): Boolean = this.genome.contains(genome.primary)
+interface Taxon {
+    val id: Int
+    val name: String
+    val genome: Genome
+    val isReal: Boolean
+
+    fun clone(genome: Genome = this.genome): Taxon //TODO: Get rid of this method
+    fun contains(genome: Genome): Boolean
 }

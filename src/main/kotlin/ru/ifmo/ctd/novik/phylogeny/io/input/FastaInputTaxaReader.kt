@@ -1,6 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.io.input
 
-import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.common.ObservedTaxon
 import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 import java.io.File
 
@@ -8,9 +8,9 @@ import java.io.File
  * @author Dmitry ITMO University
  */
 class FastaInputTaxaReader : InputTaxaReader {
-    override fun readFile(filename: String): List<Taxon> {
+    override fun readFile(filename: String): List<ObservedTaxon> {
         val reader = File(filename).bufferedReader()
-        val result = mutableListOf<Taxon>()
+        val result = mutableListOf<ObservedTaxon>()
 
         var name = ""
         var genome = ""
@@ -18,7 +18,7 @@ class FastaInputTaxaReader : InputTaxaReader {
         reader.forEachLine {
             if (it.startsWith(">")) {
                 if (genome.isNotEmpty())
-                    result.add(Taxon(id++, name, genome.toGenome()))
+                    result.add(ObservedTaxon(id++, name, genome.toGenome()))
                 name = it.removePrefix(">")
                 genome = ""
             } else {
@@ -27,7 +27,7 @@ class FastaInputTaxaReader : InputTaxaReader {
         }
 
         if (result.size == id && genome.isNotEmpty())
-            result.add(Taxon(id++, name, genome.toGenome()))
+            result.add(ObservedTaxon(id++, name, genome.toGenome()))
         return result
     }
 }

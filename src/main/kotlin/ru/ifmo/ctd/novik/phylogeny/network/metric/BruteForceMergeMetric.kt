@@ -30,7 +30,7 @@ open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEva
                     val pos = positions[permutation[index++]]
                     builder[pos] = secondGenome[pos]
 
-                    val taxon = baseTaxon.copy(genome = builder.toString().toMutableGenome())
+                    val taxon = baseTaxon.clone(genome = builder.toString().toMutableGenome())
                     for (node in distances.keys) {
                         val distance = distanceEvaluator.evaluate(taxon, node.taxon)
                         if (distance.value < metaData.bridgeLength)
@@ -44,13 +44,13 @@ open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEva
             if (processPathPart(firstNode.taxon, metaData.firstClusterPart.size - 1, secondDistances) == ProcessionResult.FAIL) {
                 continue
             }
-            val newFirstTaxon = firstNode.taxon.copy(genome = builder.toString().toMutableGenome())
+            val newFirstTaxon = firstNode.taxon.clone(genome = builder.toString().toMutableGenome())
 
             for (i in 0 until metaData.bridgeLength) {
                 val pos = positions[permutation[index++]]
                 builder[pos] = secondGenome[pos]
             }
-            val newSecondTaxon = secondNode.taxon.copy(genome = builder.toString().toMutableGenome())
+            val newSecondTaxon = secondNode.taxon.clone(genome = builder.toString().toMutableGenome())
 
             if (processPathPart(secondNode.taxon, metaData.secondClusterPart.size - 1, firstDistances) == ProcessionResult.FAIL) {
                 continue

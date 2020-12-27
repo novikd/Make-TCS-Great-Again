@@ -3,7 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.io.input
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.common.ObservedTaxon
 import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 
 /**
@@ -12,7 +12,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 internal class SimpleInputTaxaReaderTest {
     private val sampleFile = "samples/sample01.txt"
     private val expectedTaxonList = listOf("AA", "AG", "AC")
-        .mapIndexed { id, genome -> Taxon(id, name = "taxon$id", genome = genome.toGenome()) }
+        .mapIndexed { id, genome -> ObservedTaxon(id, name = "taxon$id", genome = genome.toGenome()) }
 
     @Test
     fun `readFile on sample01`() {

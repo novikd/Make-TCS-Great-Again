@@ -1,7 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.distance.taxa
 
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
-import kotlin.math.min
 
 /**
  * @author Novik Dmitry ITMO University

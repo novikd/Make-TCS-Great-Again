@@ -166,7 +166,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
 
     private fun createNode(genome: String): TopologyNode {
 //        genomes.add(genome)
-        return TopologyNode(Node(Taxon(id, "seq${id++}", genome.toGenome())))
+        return TopologyNode(Node(ObservedTaxon(id, "seq${id++}", genome.toGenome())))
     }
 
     val nodes = mutableListOf<Node>()

@@ -7,7 +7,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
  * @author Novik Dmitry ITMO University
  */
 data class Node(val taxon: Taxon) {
-    val isRealTaxon = taxon.genome.isReal
+    val isRealTaxon = taxon.isReal
     var nodeName: String = taxon.name
     val neighbors: MutableList<Node> = mutableListOf()
     val next: MutableList<Node> = mutableListOf()
