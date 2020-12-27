@@ -4,7 +4,7 @@ jdk:
 before_install:
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar
-script: ./gradlew clean build jacocoTestReport coveralls
+script: ./gradlew clean build jacocoTestReport coveralls --stacktrace
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - curl -F 'json_file=@build/coveralls/report.json' 'https://coveralls.io/api/v1/jobs'
