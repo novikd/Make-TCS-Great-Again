@@ -4,7 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.Node
 import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 open class MergingBridge(
     val firstNode: Node,

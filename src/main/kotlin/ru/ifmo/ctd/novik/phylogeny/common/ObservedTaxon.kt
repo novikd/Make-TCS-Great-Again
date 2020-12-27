@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.common
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 data class ObservedTaxon(
     override val id: Int,

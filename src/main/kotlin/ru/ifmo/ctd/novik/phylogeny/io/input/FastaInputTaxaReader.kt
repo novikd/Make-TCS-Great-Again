@@ -5,7 +5,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 import java.io.File
 
 /**
- * @author Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 class FastaInputTaxaReader : InputTaxaReader {
     override fun readFile(filename: String): List<ObservedTaxon> {

@@ -4,7 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 interface ClusterDistanceEvaluator {
     val taxonDistanceEvaluator: TaxonDistanceEvaluator

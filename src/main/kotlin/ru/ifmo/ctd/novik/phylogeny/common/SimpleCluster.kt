@@ -4,7 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.Node
 import ru.ifmo.ctd.novik.phylogeny.utils.genome
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 class SimpleCluster(override val nodes: MutableList<Node>) : Cluster {
     override val terminals: List<Node>

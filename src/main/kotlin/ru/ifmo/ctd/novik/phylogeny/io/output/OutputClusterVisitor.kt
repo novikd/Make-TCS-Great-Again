@@ -6,7 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.network.Topology
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 interface OutputClusterVisitor {
     fun visit(cluster: Cluster): String

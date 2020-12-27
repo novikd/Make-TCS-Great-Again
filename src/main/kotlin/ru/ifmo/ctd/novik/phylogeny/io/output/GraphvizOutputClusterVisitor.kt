@@ -8,7 +8,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.network.Topology
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 class GraphvizOutputClusterVisitor(private val printer: Printer) : OutputClusterVisitor {
 

@@ -3,7 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.network.metric
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 class TCSMergeMetric(
     private val clusterDistance: Int,

@@ -12,7 +12,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toRooted
 import ru.ifmo.ctd.novik.phylogeny.utils.topology
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 abstract class AbstractDistanceBasedModel : IModel {
     abstract val defaultMergingCandidate: MergingCandidate

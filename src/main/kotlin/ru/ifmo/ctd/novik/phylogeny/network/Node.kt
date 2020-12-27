@@ -4,7 +4,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 data class Node(val taxon: Taxon) {
     val isRealTaxon = taxon.isReal

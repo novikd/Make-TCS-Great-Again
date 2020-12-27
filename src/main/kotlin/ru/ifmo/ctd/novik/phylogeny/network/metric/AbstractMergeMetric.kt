@@ -6,7 +6,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingMetaData
 import ru.ifmo.ctd.novik.phylogeny.utils.computeGraphDistances
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 abstract class AbstractMergeMetric(
     private val taxonDistanceEvaluator: TaxonDistanceEvaluator

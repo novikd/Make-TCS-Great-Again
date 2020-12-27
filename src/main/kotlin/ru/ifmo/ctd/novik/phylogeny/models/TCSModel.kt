@@ -10,7 +10,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.merging.SimpleMergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 open class TCSModel(
     private val distanceEvaluator: ClusterDistanceEvaluator

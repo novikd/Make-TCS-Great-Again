@@ -8,7 +8,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 import java.io.File
 
 /**
- * @author Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 internal class FastaInputTaxaReaderTest {
     val testData = ">taxon0\n" +

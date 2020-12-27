@@ -7,7 +7,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.Node
 /**
  * Calculates distance between clusters. Only taxa from input data is taken into account.
  *
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 class RealClusterDistanceEvaluator(
         distanceEvaluator: TaxonDistanceEvaluator

@@ -7,7 +7,7 @@ import ru.ifmo.ctd.novik.phylogeny.common.ObservedTaxon
 import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 internal class SimpleInputTaxaReaderTest {
     private val sampleFile = "samples/sample01.txt"

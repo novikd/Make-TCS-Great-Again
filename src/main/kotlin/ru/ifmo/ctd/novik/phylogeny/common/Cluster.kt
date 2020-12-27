@@ -3,7 +3,7 @@ package ru.ifmo.ctd.novik.phylogeny.common
 import ru.ifmo.ctd.novik.phylogeny.network.Node
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 interface Cluster : Iterable<Node> {
     val genomeNumber: Int

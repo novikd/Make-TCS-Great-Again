@@ -13,7 +13,7 @@ import java.util.logging.Level
 import java.util.logging.LogManager
 
 /**
- * @author Novik Dmitry ITMO University
+ * @author Dmitry Novik ITMO University
  */
 fun main(args: Array<String>) {
     val parser = ArgParser("VPR_MCMC")
