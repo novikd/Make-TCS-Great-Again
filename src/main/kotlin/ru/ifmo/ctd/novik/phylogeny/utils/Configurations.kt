@@ -45,7 +45,7 @@ object ModelChoice : ArgType<PhylogeneticModel>(true) {
 
 fun IModel.evaluateSimpleData(dataFile: String): Phylogeny {
     val reader = SimpleInputTaxaReader()
-    val taxonList = reader.readFile(dataFile)
+    val taxonList = reader.readFile(dataFile).unify()
 
     val phylogeny = this.computePhylogeny(taxonList)
     phylogeny.unify()

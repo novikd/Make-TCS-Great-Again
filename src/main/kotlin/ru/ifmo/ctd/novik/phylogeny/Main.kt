@@ -36,7 +36,7 @@ fun main(args: Array<String>) {
         "fas" -> FastaInputTaxaReader()
         else -> SimpleInputTaxaReader()
     }
-    val taxonList = reader.readFile(input).distinctBy { it.genome.primary }
+    val taxonList = reader.readFile(input).unify()
     println(taxonList.size)
 
     val startTime = System.currentTimeMillis()
