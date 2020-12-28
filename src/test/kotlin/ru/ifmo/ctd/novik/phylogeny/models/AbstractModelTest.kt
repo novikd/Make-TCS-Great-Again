@@ -1,7 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.models
 
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import ru.ifmo.ctd.novik.phylogeny.base.AbstractTestWithOutputFile
 import ru.ifmo.ctd.novik.phylogeny.io.output.VerbosePrinter
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
@@ -22,12 +21,11 @@ abstract class AbstractModelTest : AbstractTestWithOutputFile() {
         GlobalExecutionSettings.RANDOM = Random(0)
     }
 
-    @Test
-    fun test() {
-        runTestsWithOutput {
-            val model = phylogeneticModel.create()
-            val phylogeneticTree = model.evaluateSimpleData(this).cluster
-            phylogeneticTree.toGraphviz(VerbosePrinter())
-        }
+    override fun test(testCasePath: String): String {
+        setUp()
+
+        val model = phylogeneticModel.create()
+        val phylogeneticTree = model.evaluateSimpleData(testCasePath).cluster
+        return phylogeneticTree.toGraphviz(VerbosePrinter())
     }
 }
