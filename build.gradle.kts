@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.kt3k.gradle.plugin.CoverallsPluginExtension
 
 group = "VPR_MCMC"
@@ -32,6 +33,7 @@ tasks {
         useJUnitPlatform()
         testLogging {
             events("passed", "skipped", "failed")
+            exceptionFormat = TestExceptionFormat.FULL
         }
     }
 
