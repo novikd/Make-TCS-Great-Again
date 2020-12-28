@@ -30,6 +30,7 @@ fun List<ObservedTaxon>.unify(): List<Taxon> {
         else
             result.add(CompositeTaxon(taxa))
     }
+    result.sortBy { it.id }
     return result
 }
 
