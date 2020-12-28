@@ -7,6 +7,7 @@ import ru.ifmo.ctd.novik.phylogeny.network.Branch
 import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingCandidate
 import ru.ifmo.ctd.novik.phylogeny.network.merging.MergingResult
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.utils.logger
 import ru.ifmo.ctd.novik.phylogeny.utils.toRooted
 import ru.ifmo.ctd.novik.phylogeny.utils.topology
@@ -63,7 +64,7 @@ abstract class AbstractDistanceBasedModel : IModel {
     override fun computeTopology(taxonList: List<Taxon>): RootedTopology {
         val (cluster, branches) = computePhylogeny(taxonList)
         val topology = cluster.topology()
-        val root = branches.last().nodes.random()
+        val root = branches.last().nodes.random(GlobalExecutionSettings.RANDOM)
         return topology.toRooted(root)
     }
 }
