@@ -19,7 +19,7 @@ fun List<String>.toTaxa(): List<ObservedTaxon> =
 
 fun List<ObservedTaxon>.unify(): List<Taxon> {
     val sequenceToTaxa = mutableMapOf<String, MutableList<ObservedTaxon>>()
-    forEach { taxon -> val taxaList = sequenceToTaxa.computeIfAbsent(taxon.genome.primary) { mutableListOf(taxon) }
+    forEach { taxon -> val taxaList = sequenceToTaxa.computeIfAbsent(taxon.genome.primary) { mutableListOf() }
         taxaList.add(taxon)
     }
 
