@@ -4,9 +4,6 @@ package ru.ifmo.ctd.novik.phylogeny.common
  * @author Dmitry Novik ITMO University
  */
 data class ConstantGenome(override val primary: String) : Genome {
-    override val isReal: Boolean
-        get() = true
-
     override val size: Int
         get() = 1
 

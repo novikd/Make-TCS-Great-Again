@@ -12,12 +12,6 @@ import ru.ifmo.ctd.novik.phylogeny.utils.toMutableGenome
 internal class ConstantGenomeTest {
 
     @Test
-    fun isReal() {
-        val genome = "AT".toGenome()
-        assertTrue(genome.isReal)
-    }
-
-    @Test
     fun process() {
         val genome = "GC".toGenome()
         var count = 0

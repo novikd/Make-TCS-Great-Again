@@ -24,12 +24,6 @@ internal class GenomeWithOptionSetTest {
     }
 
     @Test
-    fun isReal() {
-        val genome = "AG".toMutableGenome()
-        assertFalse(genome.isReal)
-    }
-
-    @Test
     fun process() {
         val genome = GenomeWithOptionSet()
         genome.addAll(listOf("AT", "TC", "GT", "AC"))

@@ -15,9 +15,6 @@ class GenomeWithOptionSet() : MutableGenome {
     override val isEmpty: Boolean
         get() = genomeOptions.isEmpty()
 
-    override val isReal: Boolean
-        get() = false
-
     override fun add(genome: String) = genomeOptions.add(genome)
 
     override fun addAll(collection: Collection<String>) = genomeOptions.addAll(collection)

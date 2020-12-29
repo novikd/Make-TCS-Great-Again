@@ -8,6 +8,5 @@ interface Genome : Iterable<String> {
     val size: Int
 
     val isEmpty: Boolean
-    val isReal: Boolean
     fun contains(genome: String): Boolean
 }
