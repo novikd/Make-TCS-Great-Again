@@ -6,16 +6,50 @@ import ru.ifmo.ctd.novik.phylogeny.common.*
  * @author Dmitry Novik ITMO University
  */
 
+fun buildGenomeSequence(reference: String, snpList: List<SNP>): String = buildString(reference.length) {
+    append(reference)
+    snpList.forEach { (index, symbol) -> setCharAt(index, symbol) }
+}
+
 fun String.toGenome(): Genome = ConstantGenome(this)
 
 fun String.toMutableGenome(): MutableGenome = GenomeWithOptionSet(this)
+
+fun Genome.compress(reference: ReferenceSequence): CompressedGenome {
+    if (this is CompressedGenome)
+        return this
+    return CompressedConstantGenome(reference, reference.computeSNP(primary))
+}
 
 internal var taxonGenerator = generateSequence(ReconstructedTaxon(0)) { ReconstructedTaxon(it.id + 1) }.iterator()
 
 fun createTaxon(): ReconstructedTaxon = taxonGenerator.next()
 
+fun createTaxon(genome: Genome): ReconstructedTaxon = createTaxon().copy(genome = genome)
+
 fun List<String>.toTaxa(): List<ObservedTaxon> =
     this.mapIndexed { index, sequence -> ObservedTaxon(index, "taxon$index", sequence.toGenome()) }
+
+fun List<ObservedTaxon>.compress(): List<ObservedTaxon> {
+    val counters = Array<MutableMap<Char, Int>>(first().genome.primary.length) { mutableMapOf() }
+    forEach {
+        it.genome.primary.forEachIndexed { index, char ->
+            val map = counters[index]
+            val value = map.getOrDefault(char, 0)
+            map[char] = value + 1
+        }
+    }
+
+    val sequence = buildString(counters.size) {
+        counters.forEach { counter ->
+            val argmax = counter.maxByOrNull { it.value }!!.key
+            append(argmax)
+        }
+    }
+    val reference = ReferenceSequence(sequence)
+
+    return map { it.copy(genome = it.genome.compress(reference)) }
+}
 
 fun List<ObservedTaxon>.unify(): List<Taxon> {
     val sequenceToTaxa = mutableMapOf<String, MutableList<ObservedTaxon>>()

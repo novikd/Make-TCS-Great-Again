@@ -2,6 +2,7 @@ package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import kotlinx.coroutines.*
 import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
+import ru.ifmo.ctd.novik.phylogeny.common.SNP
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.events.Recombination
 import ru.ifmo.ctd.novik.phylogeny.events.RecombinationGroup
@@ -218,14 +219,11 @@ class HotspotMoveModification(val hotspots: MutableList<Int>) : Modification {
     }
 
     private fun createAncestor(topology: RootedTopology, commonDifference: Set<Pair<Int, Char>>, child: TopologyNode): TopologyNode {
-        val builder = StringBuilder(child.genome.primary)
         var current = child.node
         val path = mutableListOf(current)
 
         for ((index, char) in commonDifference) {
-            builder[index] = char
-            val newNode = Node()
-            (newNode.genome as MutableGenome).add(builder.toString())
+            val newNode = Node(current.genome.mutate(listOf(SNP(index, char))))
 
             topology.topology.cluster.nodes.add(newNode)
             path.add(newNode)

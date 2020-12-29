@@ -1,11 +1,11 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
-import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
-import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
+import ru.ifmo.ctd.novik.phylogeny.common.SNP
 import ru.ifmo.ctd.novik.phylogeny.network.Edge
 import ru.ifmo.ctd.novik.phylogeny.network.Node
 import ru.ifmo.ctd.novik.phylogeny.network.RootedTopology
 import ru.ifmo.ctd.novik.phylogeny.network.TopologyNode
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPositions
 import ru.ifmo.ctd.novik.phylogeny.utils.createEdge
 import ru.ifmo.ctd.novik.phylogeny.utils.genome
@@ -44,12 +44,10 @@ abstract class TreeRearrangement : Modification {
         val path = mutableListOf(startNode.node)
         for (i in 0 until positions.lastIndex) {
             val current = path.last()
-            val newNode = Node()
+            val newGenome = current.genome.mutate(listOf(SNP(positions[i], endNode.genome.primary[positions[i]])))
+            val newNode = Node(newGenome)
             createEdge(current, newNode)
 
-            val builder = StringBuilder(current.genome.primary)
-            builder[positions[i]] = endNode.genome.primary[positions[i]]
-            (newNode.genome as MutableGenome).add(builder.toString())
             path.add(newNode)
             topology.topology.cluster.nodes.add(newNode)
         }

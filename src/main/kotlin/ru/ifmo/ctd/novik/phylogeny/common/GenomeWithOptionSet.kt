@@ -1,5 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.common
 
+import ru.ifmo.ctd.novik.phylogeny.utils.buildGenomeSequence
+
 /**
  * @author Dmitry Novik ITMO University
  */
@@ -14,6 +16,8 @@ class GenomeWithOptionSet() : MutableGenome {
 
     override val isEmpty: Boolean
         get() = genomeOptions.isEmpty()
+
+    override fun mutate(mutations: List<SNP>): Genome = ConstantGenome(buildGenomeSequence(primary, mutations))
 
     override fun add(genome: String) = genomeOptions.add(genome)
 

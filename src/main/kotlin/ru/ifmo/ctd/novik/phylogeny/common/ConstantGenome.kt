@@ -1,5 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.common
 
+import ru.ifmo.ctd.novik.phylogeny.utils.buildGenomeSequence
+
 /**
  * @author Dmitry Novik ITMO University
  */
@@ -9,6 +11,8 @@ data class ConstantGenome(override val primary: String) : Genome {
 
     override val isEmpty: Boolean
         get() = false
+
+    override fun mutate(mutations: List<SNP>): Genome = ConstantGenome(buildGenomeSequence(primary, mutations))
 
     override fun contains(genome: String): Boolean = primary == genome
 

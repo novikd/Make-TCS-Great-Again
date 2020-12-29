@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.network
 
+import ru.ifmo.ctd.novik.phylogeny.common.Genome
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.utils.createTaxon
 
@@ -13,6 +14,8 @@ data class Node(val taxon: Taxon) {
     val next: MutableList<Node> = mutableListOf()
 
     constructor() : this(createTaxon())
+
+    constructor(genome: Genome) : this(createTaxon(genome))
 
     fun connect(node: Node) {
         if (neighbors.contains(node))
