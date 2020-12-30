@@ -7,7 +7,7 @@ data class CompressedConstantGenome(
     override val reference: ReferenceSequence,
     override val polymorphism: List<SNP>
 ) : CompressedGenome {
-    override val primary by lazy { reference.build(polymorphism) }
+    override val primary = CompressedGenomeOptionImpl(reference, polymorphism)
 
     override val size: Int
         get() = 1
@@ -24,17 +24,17 @@ data class CompressedConstantGenome(
             val iSNP = polymorphism[i]
             val jSNP = mutations[j]
             when {
-                i < j -> {
+                iSNP.index < jSNP.index -> {
                     resultMutations.add(iSNP)
                     ++i
                 }
-                i == j -> {
+                iSNP.index == jSNP.index -> {
                     if (reference.sequence[jSNP.index] != jSNP.value)
                         resultMutations.add(jSNP)
                     ++i
                     ++j
                 }
-                i > j -> {
+                iSNP.index > jSNP.index -> {
                     if (reference.sequence[jSNP.index] != jSNP.value)
                         resultMutations.add(jSNP)
                     ++j
@@ -55,7 +55,7 @@ data class CompressedConstantGenome(
         return CompressedConstantGenome(reference, resultMutations)
     }
 
-    override fun contains(genome: String): Boolean = polymorphism == reference.computeSNP(genome)
+    override fun contains(option: GenomeOption): Boolean = polymorphism == reference.computeSNP(option)
 
     override fun iterator() = listOf(primary).iterator()
 }

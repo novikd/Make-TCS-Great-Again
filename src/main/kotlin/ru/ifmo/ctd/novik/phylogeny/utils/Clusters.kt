@@ -103,7 +103,7 @@ fun Cluster.label(): Cluster {
     }
 
     labeled.forEach { node ->
-        val genome = node.genome.primary
+        val genome = node.genome.primary.toString()
         labels[node] = Array(length) { mutableSetOf(genome[it]) }
     }
 
@@ -147,12 +147,12 @@ fun Cluster.label(): Cluster {
             array.forEach { set ->
                 this.append(set.random(GlobalExecutionSettings.RANDOM))
             }
-        })
+        }.toGenomeOption())
     }
 
     while (labelingQueue.isNotEmpty()) {
         val node = labelingQueue.pop()
-        val nodeGenome = node.genome.primary
+        val nodeGenome = node.genome.primary.toString()
 
         node.neighbors.filter { it !in visited && it.genome.isEmpty }.forEach { neighbor ->
             val array = labels[neighbor]!!
@@ -161,7 +161,7 @@ fun Cluster.label(): Cluster {
                 nodeGenome.forEachIndexed { index, c ->
                     this.append(if (c in array[index]) c else array[index].random(GlobalExecutionSettings.RANDOM)) // TODO: it works not so well
                 }
-            })
+            }.toGenomeOption())
 
             visited.add(neighbor)
             labelingQueue.add(neighbor)
@@ -233,7 +233,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
     val labeled = phylogeny.cluster.filter { !it.genome.isEmpty }
 
     labeled.forEach { node ->
-        val genome = node.genome.primary
+        val genome = node.genome.primary.toString()
         labels[node] = Array(length) { mutableSetOf(genome[it]) }
     }
 
@@ -274,13 +274,13 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
                 array.forEach { set ->
                     this.append(set.random(GlobalExecutionSettings.RANDOM))
                 }
-            })
+            }.toGenomeOption())
         }
     }
 
     while (queue.isNotEmpty()) {
         val node = queue.pop()
-        val nodeGenome = node.genome.primary
+        val nodeGenome = node.genome.primary.toString()
 
         node.next.forEach { next ->
             if (!visited.contains(next)) {
@@ -298,7 +298,7 @@ fun RootedPhylogeny.label(): RootedPhylogeny {
                                 else
                                     append(set.random(GlobalExecutionSettings.RANDOM))
                             }
-                        })
+                        }.toGenomeOption())
                     }
                 }
             }

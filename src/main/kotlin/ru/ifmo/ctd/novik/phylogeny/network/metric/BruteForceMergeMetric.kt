@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.network.metric
 
+import ru.ifmo.ctd.novik.phylogeny.common.SNP
 import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.network.Node
@@ -22,15 +23,15 @@ open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEva
 
         val secondGenome = metaData.secondRealTaxon.genome.primary
         for (permutation in permutations(positions.size)) {
-            val builder = StringBuilder(metaData.firstRealTaxon.genome.primary)
+            var currentGenomeOption = metaData.firstRealTaxon.genome.primary
 
             var index = 0
             fun processPathPart(baseTaxon: Taxon, length: Int, distances: Map<Node, Int>): ProcessionResult {
                 for (i in 0 until length) {
                     val pos = positions[permutation[index++]]
-                    builder[pos] = secondGenome[pos]
 
-                    val taxon = baseTaxon.clone(genome = builder.toString().toMutableGenome())
+                    currentGenomeOption = currentGenomeOption.mutate(SNP(pos, secondGenome[pos]))
+                    val taxon = baseTaxon.clone(genome = currentGenomeOption.toMutableGenome())
                     for (node in distances.keys) {
                         val distance = distanceEvaluator.evaluate(taxon, node.taxon)
                         if (distance.value < metaData.bridgeLength)
@@ -44,13 +45,13 @@ open class BruteForceMergeMetric(private val distanceEvaluator: TaxonDistanceEva
             if (processPathPart(firstNode.taxon, metaData.firstClusterPart.size - 1, secondDistances) == ProcessionResult.FAIL) {
                 continue
             }
-            val newFirstTaxon = firstNode.taxon.clone(genome = builder.toString().toMutableGenome())
+            val newFirstTaxon = firstNode.taxon.clone(genome = currentGenomeOption.toMutableGenome())
 
             for (i in 0 until metaData.bridgeLength) {
                 val pos = positions[permutation[index++]]
-                builder[pos] = secondGenome[pos]
+                currentGenomeOption = currentGenomeOption.mutate(SNP(pos, secondGenome[pos]))
             }
-            val newSecondTaxon = secondNode.taxon.clone(genome = builder.toString().toMutableGenome())
+            val newSecondTaxon = secondNode.taxon.clone(genome = currentGenomeOption.toMutableGenome())
 
             if (processPathPart(secondNode.taxon, metaData.secondClusterPart.size - 1, firstDistances) == ProcessionResult.FAIL) {
                 continue

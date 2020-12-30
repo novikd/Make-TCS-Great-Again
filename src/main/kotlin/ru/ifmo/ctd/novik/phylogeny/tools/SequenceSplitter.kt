@@ -34,7 +34,7 @@ fun List<Taxon>.toNexus(): String {
 }
 
 fun main(args: Array<String>) {
-    var taxonList = FastaInputTaxaReader().readFile(args.last()).map { Pair(it.name, it.genome.primary) }
+    var taxonList = FastaInputTaxaReader().readFile(args.last()).map { Pair(it.name, it.genome.primary.toString()) }
 
     val hotspots by ConfigurationDelegate()
     val sortedHotspots = hotspots.sorted()

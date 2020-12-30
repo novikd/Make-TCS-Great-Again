@@ -3,24 +3,24 @@ package ru.ifmo.ctd.novik.phylogeny.common
 data class CompressedGenomeWithOptionSet(override val reference: ReferenceSequence) : CompressedGenome, MutableGenome {
     private val polymorphismOptions = mutableSetOf<List<SNP>>()
 
-    override fun add(genome: String): Boolean = polymorphismOptions.add(reference.computeSNP(genome))
+    override fun add(option: GenomeOption): Boolean = polymorphismOptions.add(reference.computeSNP(option))
 
-    override fun addAll(collection: Collection<String>): Boolean {
+    override fun addAll(collection: Collection<GenomeOption>): Boolean {
         return polymorphismOptions.addAll(collection.map { reference.computeSNP(it) })
     }
 
-    override fun remove(genome: String): Boolean = polymorphismOptions.remove(reference.computeSNP(genome))
+    override fun remove(option: GenomeOption): Boolean = polymorphismOptions.remove(reference.computeSNP(option))
 
-    override fun removeIf(predicate: String.() -> Boolean): Boolean =
-        polymorphismOptions.removeIf { predicate(reference.build(it)) }
+    override fun removeIf(predicate: (GenomeOption) -> Boolean): Boolean =
+        polymorphismOptions.removeIf { predicate(CompressedGenomeOptionImpl(reference, it)) }
 
-    override fun replace(newOptions: List<String>) {
+    override fun replace(newOptions: List<GenomeOption>) {
         polymorphismOptions.clear()
         addAll(newOptions)
     }
 
-    override val primary: String
-        get() = reference.build(polymorphismOptions.first())
+    override val primary: GenomeOption
+        get() = CompressedGenomeOptionImpl(reference, polymorphismOptions.first())
 
     override val size: Int
         get() = polymorphismOptions.size
@@ -31,9 +31,9 @@ data class CompressedGenomeWithOptionSet(override val reference: ReferenceSequen
     override fun mutate(mutations: List<SNP>): Genome =
         CompressedConstantGenome(reference, polymorphism).mutate(mutations)
 
-    override fun contains(genome: String): Boolean = polymorphismOptions.contains(reference.computeSNP(genome))
+    override fun contains(option: GenomeOption): Boolean = polymorphismOptions.contains(reference.computeSNP(option))
 
-    override fun iterator(): Iterator<String> = polymorphismOptions.map { reference.build(it) }.iterator()
+    override fun iterator(): Iterator<GenomeOption> = polymorphismOptions.map { CompressedGenomeOptionImpl(reference, it) }.iterator()
 
     override val polymorphism: List<SNP>
         get() = polymorphismOptions.first()

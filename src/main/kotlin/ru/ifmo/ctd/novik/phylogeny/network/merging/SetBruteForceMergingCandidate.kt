@@ -1,8 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.network.merging
 
-import ru.ifmo.ctd.novik.phylogeny.common.Cluster
-import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
-import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
+import ru.ifmo.ctd.novik.phylogeny.common.*
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
@@ -47,7 +45,7 @@ class SetBruteForceMergingCandidate(
         specify(minimum.first)
         specify(minimum.second)
 
-        val newNodesGenomes = Array<MutableSet<String>>(minimum.distance.value) { mutableSetOf() }
+        val newNodesGenomes = Array<MutableSet<GenomeOption>>(minimum.distance.value) { mutableSetOf() }
         newNodesGenomes[0].addAll(firstGenomes)
 
         minimum.distance.forEach { (firstGenome, secondGenome) ->
@@ -57,10 +55,9 @@ class SetBruteForceMergingCandidate(
                 val current = newNodesGenomes[i]
                 newNodesGenomes[i - 1].forEach { genome ->
                     positions.forEach { position ->
-                        if (genome[position] != secondGenome[position]) {
-                            val builder = StringBuilder(genome)
-                            builder[position] = secondGenome[position]
-                            current.add(builder.toString())
+                        val mutatedChar = secondGenome[position]
+                        if (genome[position] != mutatedChar) {
+                            current.add(genome.mutate(SNP(position, mutatedChar)))
                         }
                     }
                 }
@@ -85,7 +82,7 @@ class SetBruteForceMergingCandidate(
         return MergingResult(SimpleCluster(nodes), Branch(newNodes))
     }
 
-    private fun updateGenomes(node: Node, genomes: List<String>) = (node.genome as? MutableGenome)?.replace(genomes)
+    private fun updateGenomes(node: Node, genomes: List<GenomeOption>) = (node.genome as? MutableGenome)?.replace(genomes)
 
     override fun compareTo(other: MergingCandidate): Int {
         if (other == emptyMergingCandidate())
@@ -123,7 +120,7 @@ class SetBruteForceMergingCandidate(
     private fun update(parent: Node, child: Node) {
         val mutableGenome = child.genome as MutableGenome
         mutableGenome.removeIf {
-            parent.genome.none { parentGenome -> hammingDistance(this, parentGenome) == 1 }
+            parent.genome.none { parentGenome -> hammingDistance(it, parentGenome) == 1 }
         }
     }
 

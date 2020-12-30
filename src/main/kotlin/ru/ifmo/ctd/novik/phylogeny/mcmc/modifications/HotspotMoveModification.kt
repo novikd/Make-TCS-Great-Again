@@ -1,7 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.mcmc.modifications
 
 import kotlinx.coroutines.*
-import ru.ifmo.ctd.novik.phylogeny.common.MutableGenome
 import ru.ifmo.ctd.novik.phylogeny.common.SNP
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.events.Recombination

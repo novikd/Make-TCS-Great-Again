@@ -2,21 +2,22 @@ package ru.ifmo.ctd.novik.phylogeny.distance.taxa
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import ru.ifmo.ctd.novik.phylogeny.common.Taxon
+import ru.ifmo.ctd.novik.phylogeny.common.Genome
+import ru.ifmo.ctd.novik.phylogeny.common.GenomeOption
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 
 /**
  * @author Dmitry Novik ITMO University
  */
 class AbsoluteTaxonDistanceEvaluator : AbstractTaxonDistanceEvaluator() {
-    override fun evaluate(lhs: Taxon, rhs: Taxon): TaxonDistance {
+    override fun evaluate(lhs: Genome, rhs: Genome): TaxonDistance {
         val options = runBlocking {
-            lhs.genome.map { lhsGenome ->
+            lhs.map { lhsGenome ->
                 this.async {
                     var currentDistance = Int.MAX_VALUE
-                    val genomePairs = mutableListOf<Pair<String, String>>()
+                    val genomePairs = mutableListOf<Pair<GenomeOption, GenomeOption>>()
 
-                    rhs.genome.map { rhsGenome ->
+                    rhs.map { rhsGenome ->
                         this.async {
                             Pair(rhsGenome, hammingDistance(lhsGenome, rhsGenome))
                         }
@@ -32,7 +33,7 @@ class AbsoluteTaxonDistanceEvaluator : AbstractTaxonDistanceEvaluator() {
                 }
             }.map { it.await() }
         }
-        val (currentDistance, genomePairs) = options.fold(Pair(Int.MAX_VALUE, mutableListOf<Pair<String, String>>())) { acc, pair ->
+        val (currentDistance, genomePairs) = options.fold(Pair(Int.MAX_VALUE, mutableListOf<Pair<GenomeOption, GenomeOption>>())) { acc, pair ->
             when {
                 acc.first < pair.first -> acc
                 acc.first > pair.first -> pair

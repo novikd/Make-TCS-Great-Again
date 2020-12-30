@@ -118,8 +118,8 @@ class IndependentDataGenerator(val output: Boolean = true) {
             val firstParent = currentLeafs[parents.first]
             val secondParent = currentLeafs[parents.second]
 
-            val prefix = hammingDistance(firstParent.genome.primary.substring(0, hotspot), secondParent.genome.primary.substring(0, hotspot))
-            val suffix = hammingDistance(firstParent.genome.primary.substring(hotspot), secondParent.genome.primary.substring(hotspot))
+            val prefix = hammingDistance(firstParent.genome.primary.toString().substring(0, hotspot), secondParent.genome.primary.toString().substring(0, hotspot))
+            val suffix = hammingDistance(firstParent.genome.primary.toString().substring(hotspot), secondParent.genome.primary.toString().substring(hotspot))
             if (prefix >= HOTSPOT_DISTANCE_THRESHOLD * GENOME_LENGTH
                     && suffix >= HOTSPOT_DISTANCE_THRESHOLD * GENOME_LENGTH)
                 return parents
@@ -132,12 +132,12 @@ class IndependentDataGenerator(val output: Boolean = true) {
         if (output)
             recombinationOutputFile.appendText("Recombination at $hotspot site: ${firstParent.node} and ${secondParent.node}\n")
 
-        val childPrefix = firstParent.genome.primary.substring(0, hotspot)
-        val secondParentPrefix = secondParent.genome.primary.substring(0, hotspot)
+        val childPrefix = firstParent.genome.primary.toString().substring(0, hotspot)
+        val secondParentPrefix = secondParent.genome.primary.toString().substring(0, hotspot)
         if (output)
             recombinationOutputFile.appendText("Prefix hamming: ${hammingDistance(childPrefix, secondParentPrefix)}\n")
-        val childSuffix = secondParent.genome.primary.substring(hotspot)
-        val firstParentSuffix = firstParent.genome.primary.substring(hotspot)
+        val childSuffix = secondParent.genome.primary.toString().substring(hotspot)
+        val firstParentSuffix = firstParent.genome.primary.toString().substring(hotspot)
         if (output)
             recombinationOutputFile.appendText("Suffix hamming: ${hammingDistance(firstParentSuffix, childSuffix)}\n")
 
@@ -181,7 +181,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
         val variable = PoissonRandomVariable(GENOME_LENGTH * SubstitutionModel.mutationRate, LOCAL_RANDOM)
         val mutations = max(variable.next(), 1)
 
-        val builder = StringBuilder(parent.genome.primary)
+        val builder = StringBuilder(parent.genome.primary.toString())
         val path = mutableListOf(parent.node)
 
         val mutationPositions = mutableListOf<Int>()
@@ -196,7 +196,7 @@ class IndependentDataGenerator(val output: Boolean = true) {
             val node = createIntermediateNode()
 
             val genome = builder.toString()
-            (node.genome as MutableGenome).add(genome)
+            (node.genome as MutableGenome).add(genome.toGenomeOption())
 //            genomes.add(genome)
             createEdge(path.last(), node)
             path.add(node)
@@ -265,10 +265,10 @@ fun generate(generator: IndependentDataGenerator): GenerationResult {
         val positions = computeDistinctPositions(parentFromDeletedPath.taxon, child.node.taxon)
         for (i in 0 until positions.size - 1) {
             val pos = positions[i]
-            val builder = StringBuilder(deletedPath.last().genome.primary)
-            builder[pos] = parentFromDeletedPath.genome.primary[pos]
+            val builder = StringBuilder(deletedPath.last().genome.primary.toString())
+            builder[pos] = parentFromDeletedPath.genome.primary.toString()[pos]
             val node = Node()
-            (node.genome as MutableGenome).add(builder.toString())
+            (node.genome as MutableGenome).add(builder.toString().toGenomeOption())
             deletedPath.add(node)
         }
         deletedPath.add(parentFromDeletedPath)

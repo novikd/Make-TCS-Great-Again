@@ -16,4 +16,10 @@ data class ReferenceSequence(val sequence: String) {
         }
         return result
     }
+
+    fun computeSNP(option: GenomeOption): List<SNP> {
+        if (option is CompressedGenomeOption)
+            return option.polymorphism
+        return computeSNP(option.toString())
+    }
 }

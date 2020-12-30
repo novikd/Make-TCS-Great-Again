@@ -12,7 +12,7 @@ class GeneratorChecker(val generator: IndependentDataGenerator) {
     fun run() {
         for (i in 0..1_000_000) {
             val genomes = generator.generate()
-            val set = (genomes.map { it.node } + generator.nodes).map { it.genome.primary }.toSet()
+            val set = (genomes.map { it.node } + generator.nodes).map { it.genome.primary.toString() }.toSet()
             val cluster = SimpleCluster((genomes.map { it.node } + generator.nodes).toMutableList())
 
 

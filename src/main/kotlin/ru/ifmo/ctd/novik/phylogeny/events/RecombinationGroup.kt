@@ -28,14 +28,6 @@ data class RecombinationGroup(
         elements.add(recombination)
     }
 
-    operator fun contains(childGenome: String): Boolean {
-        return runBlocking {
-            elements.map { other ->
-                this.async { hammingDistance(childGenome, other.child.genome.primary) < 10 }
-            }.map { it.await() }.any()
-        }
-    }
-
     operator fun contains(recombination: Recombination): Boolean {
         if (recombination.pos != hotspot)
             return false

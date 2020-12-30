@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import ru.ifmo.ctd.novik.phylogeny.utils.toGenome
+import ru.ifmo.ctd.novik.phylogeny.utils.toGenomeOption
 import ru.ifmo.ctd.novik.phylogeny.utils.toMutableGenome
 
 /**
@@ -19,7 +20,7 @@ internal class ConstantGenomeTest {
 
         genome.forEach {
             count++
-            result = result || (it == "GC")
+            result = result || (it == "GC".toGenomeOption())
         }
         assertEquals(1, count)
         assertTrue(result)

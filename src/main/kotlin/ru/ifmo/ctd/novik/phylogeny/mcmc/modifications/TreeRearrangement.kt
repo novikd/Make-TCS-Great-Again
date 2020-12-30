@@ -42,9 +42,10 @@ abstract class TreeRearrangement : Modification {
     protected fun createNewEdge(startNode: TopologyNode, endNode: TopologyNode, topology: RootedTopology) {
         val positions = computeDistinctPositions(startNode.node.taxon, endNode.node.taxon)
         val path = mutableListOf(startNode.node)
+        val endNodeGenome = endNode.genome.primary
         for (i in 0 until positions.lastIndex) {
             val current = path.last()
-            val newGenome = current.genome.mutate(listOf(SNP(positions[i], endNode.genome.primary[positions[i]])))
+            val newGenome = current.genome.mutate(listOf(SNP(positions[i], endNodeGenome[positions[i]])))
             val newNode = Node(newGenome)
             createEdge(current, newNode)
 

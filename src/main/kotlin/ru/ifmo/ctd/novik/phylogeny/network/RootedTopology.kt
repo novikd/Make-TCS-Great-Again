@@ -1,5 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.network
 
+import ru.ifmo.ctd.novik.phylogeny.common.GenomeOption
 import ru.ifmo.ctd.novik.phylogeny.events.Recombination
 import ru.ifmo.ctd.novik.phylogeny.events.RecombinationGroupAmbassador
 import ru.ifmo.ctd.novik.phylogeny.utils.*
@@ -16,7 +17,7 @@ data class RootedTopology(
     val edges: List<Edge>
         get() = topology.flatMap { it.next }
 
-    val genomes: List<Pair<Node, String>>
+    val genomes: List<Pair<Node, GenomeOption>>
         get() = topology.cluster.map { node -> node to node.genome.primary }
 
     val recombinationEdges: Set<Edge>
