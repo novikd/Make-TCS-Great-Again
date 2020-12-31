@@ -232,10 +232,10 @@ class IndependentDataGenerator(val output: Boolean = true) {
 }
 
 data class GenerationResult(
-        val genomes: MutableList<TopologyNode>,
-        val cluster: Cluster,
-        val topology: Topology,
-        val rootedTopology: RootedTopology
+    val genomes: MutableList<TopologyNode>,
+    val cluster: Cluster,
+    val topology: Topology,
+    val rootedTopology: RootedTopology
 )
 
 fun generate(generator: IndependentDataGenerator): GenerationResult {

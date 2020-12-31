@@ -1,6 +1,4 @@
-package ru.ifmo.ctd.novik.phylogeny.common
-
-import ru.ifmo.ctd.novik.phylogeny.network.Node
+package ru.ifmo.ctd.novik.phylogeny.network
 
 /**
  * @author Dmitry Novik ITMO University

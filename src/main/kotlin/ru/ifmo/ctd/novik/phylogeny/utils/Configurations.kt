@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
 import kotlinx.cli.ArgType
-import ru.ifmo.ctd.novik.phylogeny.common.Phylogeny
+import ru.ifmo.ctd.novik.phylogeny.network.Phylogeny
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.AbsoluteClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.AbsoluteTaxonDistanceEvaluator

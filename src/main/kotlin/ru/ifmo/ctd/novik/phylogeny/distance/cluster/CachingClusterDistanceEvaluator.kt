@@ -1,6 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.distance.cluster
 
-import ru.ifmo.ctd.novik.phylogeny.common.Cluster
+import ru.ifmo.ctd.novik.phylogeny.network.Cluster
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 
 class CachingClusterDistanceEvaluator(private val inner: ClusterDistanceEvaluator) : ClusterDistanceEvaluator {

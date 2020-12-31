@@ -1,7 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.network.merging
 
-import ru.ifmo.ctd.novik.phylogeny.common.Cluster
-import ru.ifmo.ctd.novik.phylogeny.common.SimpleCluster
+import ru.ifmo.ctd.novik.phylogeny.network.Cluster
+import ru.ifmo.ctd.novik.phylogeny.network.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
@@ -15,10 +15,10 @@ import ru.ifmo.ctd.novik.phylogeny.utils.*
  * @author Dmitry Novik ITMO University
  */
 open class SimpleMergingCandidate(
-        override val firstCluster: Cluster,
-        override val secondCluster: Cluster,
-        override val taxonDistanceEvaluator: TaxonDistanceEvaluator,
-        val distance: ClusterDistance
+    override val firstCluster: Cluster,
+    override val secondCluster: Cluster,
+    override val taxonDistanceEvaluator: TaxonDistanceEvaluator,
+    val distance: ClusterDistance
 ) : MergingCandidate {
 
     override val mergeMetric: MergeMetric by lazy { TCSMergeMetric(distance.value, taxonDistanceEvaluator) }

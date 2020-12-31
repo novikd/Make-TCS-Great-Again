@@ -1,6 +1,5 @@
 package ru.ifmo.ctd.novik.phylogeny.network
 
-import ru.ifmo.ctd.novik.phylogeny.common.Cluster
 import ru.ifmo.ctd.novik.phylogeny.utils.checkInvariant
 import ru.ifmo.ctd.novik.phylogeny.utils.debug
 
@@ -8,9 +7,9 @@ import ru.ifmo.ctd.novik.phylogeny.utils.debug
  * @author Dmitry Novik ITMO University
  */
 data class Topology(
-        val cluster: Cluster,
-        val nodes: MutableList<TopologyNode>,
-        val edges: MutableList<Pair<Edge, Edge>>
+    val cluster: Cluster,
+    val nodes: MutableList<TopologyNode>,
+    val edges: MutableList<Pair<Edge, Edge>>
 ) : Iterable<TopologyNode> {
 
     fun clone(): TopologyCloneResult {

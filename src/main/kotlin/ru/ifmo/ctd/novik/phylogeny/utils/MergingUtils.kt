@@ -1,6 +1,6 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
-import ru.ifmo.ctd.novik.phylogeny.common.Cluster
+import ru.ifmo.ctd.novik.phylogeny.network.Cluster
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.network.Node
 import ru.ifmo.ctd.novik.phylogeny.network.merging.*

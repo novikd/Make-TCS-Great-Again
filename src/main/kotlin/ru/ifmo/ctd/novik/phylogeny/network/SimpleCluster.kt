@@ -1,6 +1,6 @@
-package ru.ifmo.ctd.novik.phylogeny.common
+package ru.ifmo.ctd.novik.phylogeny.network
 
-import ru.ifmo.ctd.novik.phylogeny.network.Node
+import ru.ifmo.ctd.novik.phylogeny.common.Taxon
 import ru.ifmo.ctd.novik.phylogeny.utils.genome
 
 /**

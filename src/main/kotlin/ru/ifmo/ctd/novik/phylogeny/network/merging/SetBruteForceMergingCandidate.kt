@@ -5,7 +5,9 @@ import ru.ifmo.ctd.novik.phylogeny.distance.cluster.ClusterDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.hammingDistance
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.TaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.network.Branch
+import ru.ifmo.ctd.novik.phylogeny.network.Cluster
 import ru.ifmo.ctd.novik.phylogeny.network.Node
+import ru.ifmo.ctd.novik.phylogeny.network.SimpleCluster
 import ru.ifmo.ctd.novik.phylogeny.network.metric.MergeMetric
 import ru.ifmo.ctd.novik.phylogeny.utils.computeDistinctPositions
 import ru.ifmo.ctd.novik.phylogeny.utils.emptyMergingCandidate
@@ -17,9 +19,9 @@ import java.util.*
  * @author Dmitry Novik ITMO University
  */
 class SetBruteForceMergingCandidate(
-        override val firstCluster: Cluster,
-        override val secondCluster: Cluster,
-        private val distance: ClusterDistance
+    override val firstCluster: Cluster,
+    override val secondCluster: Cluster,
+    private val distance: ClusterDistance
 ) : MergingCandidate {
     override val taxonDistanceEvaluator: TaxonDistanceEvaluator
         get() = TODO("not implemented")
