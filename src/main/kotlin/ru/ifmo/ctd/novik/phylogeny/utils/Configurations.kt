@@ -1,12 +1,14 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
 import kotlinx.cli.ArgType
+import ru.ifmo.ctd.novik.phylogeny.common.ObservedTaxon
 import ru.ifmo.ctd.novik.phylogeny.network.Phylogeny
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.AbsoluteClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.cluster.RealClusterDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.AbsoluteTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.taxa.PrimaryTaxonDistanceEvaluator
 import ru.ifmo.ctd.novik.phylogeny.distance.toCaching
+import ru.ifmo.ctd.novik.phylogeny.io.input.InputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.io.input.SimpleInputTaxaReader
 import ru.ifmo.ctd.novik.phylogeny.models.*
 import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
@@ -43,9 +45,17 @@ object ModelChoice : ArgType<PhylogeneticModel>(true) {
         get() = { value, _ -> PhylogeneticModel.values().find { model -> model.shortName == value } ?: PhylogeneticModel.BASE_TCS }
 }
 
+fun prepareInputData(reader: InputTaxaReader, dataFile: String): List<ObservedTaxon> {
+    val taxa = reader.readFile(dataFile)
+    if (GlobalExecutionSettings.COMPRESSION_ENABLED)
+        return taxa.compress()
+    return taxa
+}
+
 fun IModel.evaluateSimpleData(dataFile: String): Phylogeny {
     val reader = SimpleInputTaxaReader()
-    val taxonList = reader.readFile(dataFile).unify()
+    val taxa = prepareInputData(reader, dataFile)
+    val taxonList = taxa.unify()
 
     val phylogeny = this.computePhylogeny(taxonList)
     phylogeny.unify()

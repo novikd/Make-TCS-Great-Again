@@ -31,6 +31,10 @@ data class CompressedGenomeWithOptionSet(override val reference: ReferenceSequen
     override fun mutate(mutations: List<SNP>): Genome =
         CompressedConstantGenome(reference, polymorphism).mutate(mutations)
 
+    override fun toString(): String {
+        return if (isEmpty) "unknown genome" else primary.toString()
+    }
+
     override fun contains(option: GenomeOption): Boolean = polymorphismOptions.contains(reference.computeSNP(option))
 
     override fun iterator(): Iterator<GenomeOption> = polymorphismOptions.map { CompressedGenomeOptionImpl(reference, it) }.iterator()

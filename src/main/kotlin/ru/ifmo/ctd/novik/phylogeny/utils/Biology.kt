@@ -1,6 +1,7 @@
 package ru.ifmo.ctd.novik.phylogeny.utils
 
 import ru.ifmo.ctd.novik.phylogeny.common.*
+import ru.ifmo.ctd.novik.phylogeny.settings.GlobalExecutionSettings
 
 /**
  * @author Dmitry Novik ITMO University
@@ -10,6 +11,8 @@ fun buildGenomeSequence(reference: String, snpList: List<SNP>): String = buildSt
     append(reference)
     snpList.forEach { (index, symbol) -> setCharAt(index, symbol) }
 }
+
+fun createGenome() = GlobalExecutionSettings.GENOME_FACTORY.create()
 
 fun String.toGenomeOption(): GenomeOption = StringGenomeOption(this)
 
@@ -58,6 +61,7 @@ fun List<ObservedTaxon>.compress(): List<ObservedTaxon> {
         }
     }
     val reference = ReferenceSequence(sequence)
+    GlobalExecutionSettings.GENOME_FACTORY = CompressedGenomeFactory(reference)
 
     return map { it.copy(genome = it.genome.compress(reference)) }
 }

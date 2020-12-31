@@ -13,6 +13,7 @@ import ru.ifmo.ctd.novik.phylogeny.utils.BRUTE_FORCE_DISTANCE_THRESHOLD
 class SetBruteForceTCSModel(distanceEvaluator: ClusterDistanceEvaluator) : TCSModel(distanceEvaluator) {
     override fun createMergingCandidate(first: Cluster, second: Cluster, genomNumber: Int): MergingCandidate {
         val distance = evaluate(first, second)
+        assert(distance.value > 0) { "Can't create candidate with equal parts" }
         return if (distance.value > BRUTE_FORCE_DISTANCE_THRESHOLD || genomNumber >= 6_000)
             SimpleMergingCandidate(first, second, taxonDistanceEvaluator, distance)
         else

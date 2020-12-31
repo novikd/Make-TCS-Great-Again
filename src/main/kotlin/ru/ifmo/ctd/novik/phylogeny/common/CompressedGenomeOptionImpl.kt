@@ -31,12 +31,26 @@ data class CompressedGenomeOptionImpl(
 
     override fun mutate(snp: SNP): GenomeOption {
         val newPolymorphism = mutableListOf<SNP>()
+        var met = false
         polymorphism.forEach {
-            if (it.index != snp.index)
-                newPolymorphism.add(it)
-            else if (reference.sequence[snp.index] != snp.value)
-                newPolymorphism.add(snp)
+            when {
+                it.index < snp.index -> newPolymorphism.add(it)
+                it.index == snp.index -> {
+                    met = true
+                    if (reference.sequence[snp.index] != snp.value)
+                        newPolymorphism.add(snp)
+                }
+                else -> {
+                    if (!met) {
+                        newPolymorphism.add(snp)
+                        met = true
+                    }
+                    newPolymorphism.add(it)
+                }
+            }
         }
+        if (!met)
+            newPolymorphism.add(snp)
         return CompressedGenomeOptionImpl(reference, newPolymorphism)
     }
 

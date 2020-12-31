@@ -31,6 +31,8 @@ fun hammingDistance(lhs: CompressedGenomeOption, rhs: CompressedGenomeOption): I
                 ++j
         }
     }
+    result += leftMutations.size - i
+    result += rightMutations.size - j
     return result
 }
 

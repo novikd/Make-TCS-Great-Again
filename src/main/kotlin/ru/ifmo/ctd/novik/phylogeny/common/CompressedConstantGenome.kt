@@ -55,6 +55,8 @@ data class CompressedConstantGenome(
         return CompressedConstantGenome(reference, resultMutations)
     }
 
+    override fun toString(): String = primary.toString()
+
     override fun contains(option: GenomeOption): Boolean = polymorphism == reference.computeSNP(option)
 
     override fun iterator() = listOf(primary).iterator()
